@@ -9,12 +9,26 @@ using namespace std;
 
 // get desktop resolution info
 VideoMode desktop = VideoMode::getDesktopMode();
+// create view variable
+sf::View view;
 
+// textures & sprites
 sf::Texture background;
 sf::Sprite bkSprite;
 
 // Game Methods ===========================================================================================================
 
+void ResetWindow(RenderWindow& window) {
+
+	// disable repeated key events
+	window.setKeyRepeatEnabled(false);
+	// enable or disable vsync - do at start of game, or via options menu
+	window.setVerticalSyncEnabled(false);
+	// cap fps 
+	window.setFramerateLimit(60);
+	// set window view
+	window.setView(view);
+}
 
 
 // Initialise ===========================================================================================================
@@ -36,7 +50,8 @@ void Load() {
 	// set test image as sprite texture
 	bkSprite.setTexture(background);
 	// set values for source rect
-	bkSprite.setTextureRect(IntRect(Vector2(0, 0), Vector2(1920, 1080)));
+	bkSprite.setTextureRect(IntRect(Vector2(0, 0), Vector2(800, 800)));
+	bkSprite.setPosition({ 0,0 });
 
 }
 
@@ -55,8 +70,16 @@ void Update(RenderWindow& window) {
 		
 		if (event.type == sf::Event::KeyReleased)
 		{
-			
-			
+			if (event.key.code == Keyboard::F1) {
+
+				window.create(VideoMode({ 1280,720 }, desktop.bitsPerPixel), "MageMadness", sf::Style::Default);
+				ResetWindow(window);
+			}
+			if (event.key.code == Keyboard::F2) {
+
+				window.create(VideoMode(desktop.size, desktop.bitsPerPixel), "MageMadness", sf::Style::Fullscreen);
+				ResetWindow(window);
+			}
 		}
 
 		if (event.type == sf::Event::KeyPressed)
@@ -96,16 +119,14 @@ void Render(RenderWindow& window) {
 }
 
 int main() {
-
-	// set window properties
-	RenderWindow window(VideoMode(desktop.size, desktop.bitsPerPixel), "MageMadness", sf::Style::Fullscreen);
-	// disable repeated key events
-	window.setKeyRepeatEnabled(false);
-	// enable or disable vsync - do at start of game, or via options menu
-	window.setVerticalSyncEnabled(false);
-	// cap fps 
-	window.setFramerateLimit(60);
 	
+	// set up view
+	view.setSize({ 1920, 1080 });
+	view.setCenter({ view.getSize().x / 2, view.getSize().y / 2 });
+	// set initial window properties
+	RenderWindow window(VideoMode(desktop.size, desktop.bitsPerPixel), "MageMadness", sf::Style::Fullscreen);
+	ResetWindow(window);
+
 	Init();
 	Load();
 
