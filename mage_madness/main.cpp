@@ -1,5 +1,6 @@
 #include <SFML/Graphics.hpp>
 #include <iostream>
+#include "cloud.h"
 
 using namespace sf;
 using namespace std;
@@ -121,7 +122,7 @@ void Render(RenderWindow& window) {
 int main() {
 	
 	// set up view
-	view.setSize({ 1920, 1080 });
+	view.setSize({ defaultGameWidth, defaultGameHeight });
 	view.setCenter({ view.getSize().x / 2, view.getSize().y / 2 });
 	// set initial window properties
 	RenderWindow window(VideoMode(desktop.size, desktop.bitsPerPixel), "MageMadness", sf::Style::Fullscreen);
