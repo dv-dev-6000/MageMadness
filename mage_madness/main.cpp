@@ -1,12 +1,31 @@
 #include <SFML/Graphics.hpp>
 #include <iostream>
 #include "cloud.h"
+#include "LevelSystem.h"
+#include "tile.h"
 
 using namespace sf;
 using namespace std;
 
 
 // Game Variables =======================================================================================================
+
+// list of game levels/scenes
+enum GameScene {
+
+	mainMenu,
+	tutorial_1,
+	tutorial_2,
+	tutorial_3,
+	level_1,
+	level_2,
+	level_3,
+	level_4,
+	level_5
+};
+
+// var for current game scene
+GameScene currScene;
 
 // get desktop resolution info
 VideoMode desktop = VideoMode::getDesktopMode();
@@ -16,9 +35,12 @@ sf::View view;
 // textures 
 sf::Texture background;
 sf::Texture back2;
+sf::Texture tileTex;
 //sprites
 sf::Sprite bkSprite;
 sf::Sprite bk2Sprite;
+
+std::vector<Tile> tiles;
 
 // Game Methods ===========================================================================================================
 
@@ -43,7 +65,8 @@ void ResetWindow(RenderWindow& window) {
 /// </summary>
 void Init() {
 
-	
+	// set current game scene
+	currScene = mainMenu;
 	
 }
 
@@ -61,6 +84,9 @@ void Load() {
 	if (!back2.loadFromFile("res/img/TEST.png")) {
 		cerr << "Failed to load spritesheet!" << std::endl;
 	}
+	if (!tileTex.loadFromFile("res/img/SpecialBlock3.png")) {
+		cerr << "Failed to load spritesheet!" << std::endl;
+	}
 	// set test image as sprite texture
 	bkSprite.setTexture(background);
 	bk2Sprite.setTexture(back2);
@@ -69,8 +95,13 @@ void Load() {
 	bk2Sprite.setPosition({ 0,0 });
 	bkSprite.setTextureRect(IntRect(Vector2(0, 0), Vector2(800, 800)));
 	bkSprite.setPosition({ 0,0 });
-	
 
+	//level load TEST
+	//ls::loadLevelFile("res/levels/maze.txt");
+	Tile tile1("type", Vector2f(0, 0));
+	tiles.push_back(tile1);
+	Tile tile2("type", Vector2f(64, 0));
+	tiles.push_back(tile2);
 }
 
 /// <summary>
@@ -78,7 +109,43 @@ void Load() {
 /// </summary>
 void Reload() {
 
-	
+	// level logic
+	switch (currScene) {
+
+		case mainMenu:
+
+			// main menu logic here
+
+			break;
+
+		case tutorial_1:
+
+			// tut 1 logic here
+
+			break;
+
+		case tutorial_2:
+
+			// tut 2 logic here
+
+			break;
+
+		case tutorial_3:
+
+			// tut 3 logic here
+
+			break;
+
+		case level_1:
+
+			// level 1 logic here
+
+			break;
+
+		default:
+			break;
+
+	}
 
 
 }
@@ -109,6 +176,7 @@ void Update(RenderWindow& window) {
 
 				// full screen hd
 				window.create(VideoMode(desktop.size, desktop.bitsPerPixel), "MageMadness", sf::Style::Fullscreen);
+				view.setSize({ hdGameWidth, hdGameHeight });
 				ResetWindow(window);
 			}
 		}
@@ -133,7 +201,7 @@ void Update(RenderWindow& window) {
 		}
 	}
 
-	// move
+	// move when key held
 	if (Keyboard::isKeyPressed(Keyboard::Down)) {
 
 		if (bkSprite.getPosition().y < (1080 - 800)) {
@@ -142,6 +210,8 @@ void Update(RenderWindow& window) {
 		}
 		
 	}
+
+	
 
 }
 
@@ -153,6 +223,12 @@ void Render(RenderWindow& window) {
 	// Draw Everything
 	window.draw(bk2Sprite);
 	window.draw(bkSprite);
+
+	for (const auto s : tiles) {
+		window.draw(s);
+	}
+
+	//ls::Render(window);
 }
 
 int main() {

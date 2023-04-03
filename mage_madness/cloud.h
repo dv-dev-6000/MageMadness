@@ -6,3 +6,5 @@
 constexpr uint16_t hdGameWidth = 1920;
 constexpr uint16_t hdGameHeight = 1080;
 
+extern sf::Texture tileTex;
+
