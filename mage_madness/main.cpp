@@ -3,6 +3,7 @@
 #include "cloud.h"
 #include "LevelSystem.h"
 #include "tile.h"
+#include "player.h"
 
 using namespace sf;
 using namespace std;
@@ -41,6 +42,9 @@ sf::Sprite bkSprite;
 sf::Sprite bk2Sprite;
 
 std::vector<Tile> tiles;
+
+sf::Texture playerTex;
+Player player;
 
 // Game Methods ===========================================================================================================
 
@@ -97,6 +101,10 @@ void Load() {
 	if (!spikeTileTex.loadFromFile("res/img/SpikesBlue.png")) {
 		cerr << "Failed to load spritesheet!" << std::endl;
 	}
+	// load player textures
+	if (!playerTex.loadFromFile("res/img/Player.png")) {
+		cerr << "Failed to load spritesheet!" << std::endl;
+	}
 
 	// set test image as sprite texture
 	//bkSprite.setTexture(background);
@@ -111,12 +119,16 @@ void Load() {
 	ls::loadLevelFile("res/levels/maze.txt");
 
 	for (int i = 0; i < ls::_sprites.size(); i++) {
-		
+
 		tileInfo currTile = ls::_sprites[i];
-		
+
 		Tile tile = Tile(currTile.type, currTile.pos);
 		tiles.push_back(tile);
 	}
+
+	// load player 
+	player.setTexture(playerTex);
+	player.setPosition({ 100,100 });
 }
 
 /// <summary>
@@ -217,16 +229,24 @@ void Update(RenderWindow& window) {
 	}
 
 	// move when key held
-	//if (Keyboard::isKeyPressed(Keyboard::Down)) {
-	//
-	//	if (bkSprite.getPosition().y < (1080 - 800)) {
-	//
-	//		bkSprite.setPosition(bkSprite.getPosition() + Vector2f(1, 1));
-	//	}
-	//	
-	//}
-
+	if (Keyboard::isKeyPressed(Keyboard::Down)) {
 	
+		if (player.getPosition().y < (1080 - 64)) {
+	
+			player.setPosition(player.getPosition() + Vector2f(1, 1));
+		}
+		
+	}
+
+	// check player collision with walls
+	for (const auto s : tiles) {
+		sf::FloatRect pBounds = player.getGlobalBounds();
+		sf::FloatRect wBounds = s.getGlobalBounds();
+
+		if (wBounds.findIntersection(pBounds)) {
+			player.setPosition({ 100,100 });
+		}
+	}
 
 }
 
@@ -243,6 +263,8 @@ void Render(RenderWindow& window) {
 	for (const auto s : tiles) {
 		window.draw(s);
 	}
+
+	window.draw(player);
 }
 
 int main() {

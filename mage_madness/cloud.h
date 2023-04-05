@@ -12,3 +12,5 @@ extern sf::Texture gravTileTex;
 extern sf::Texture spikeTileTex;
 //extern sf::Texture endTileTex;
 
+extern sf::Texture playerTex;
+

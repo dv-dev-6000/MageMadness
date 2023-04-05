@@ -7,8 +7,6 @@ using namespace std;
 
 Tile::Tile(int type, sf::Vector2f pos) : Sprite() {
 
-			// set to default tile **change to depend on type
-	
 	switch (type) {
 
 		case 1:
