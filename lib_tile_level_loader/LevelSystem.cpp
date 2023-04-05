@@ -12,25 +12,17 @@ size_t LevelSystem::_height;
 Vector2f LevelSystem::_offset(0.0f, 0.0f);
 
 float LevelSystem::_tileSize(100.f);
-vector<std::unique_ptr<sf::RectangleShape>> LevelSystem::_sprites;
+vector<tileInfo> LevelSystem::_sprites;
 
 std::map<LevelSystem::TILE, sf::Color> LevelSystem::_colours{ {WALL, Color::White}, {END, Color::Red} };
 
-sf::Color LevelSystem::getColor(LevelSystem::TILE t) {
-    auto it = _colours.find(t);
-    if (it == _colours.end()) {
-        _colours[t] = Color::Transparent;
-    }
-    return _colours[t];
+size_t LevelSystem::getHeight() {
+    return _height;
 }
 
-void LevelSystem::setColor(LevelSystem::TILE t, sf::Color c) {
-    auto it = _colours.find(t);
-    if (it != _colours.end()) {
-        _colours[t] = c;
-    }
+size_t LevelSystem::getWidth() {
+    return _width;
 }
-
 
 void LevelSystem::loadLevelFile(const std::string& path, float tileSize) {
     _tileSize = tileSize;
@@ -57,7 +49,7 @@ void LevelSystem::loadLevelFile(const std::string& path, float tileSize) {
         case 'w':
             temp_tiles.push_back(WALL);
             break;
-        case 's':
+        case 'g':
             temp_tiles.push_back(GRAVBLOCK);
             break;
         case 'e':
@@ -66,10 +58,10 @@ void LevelSystem::loadLevelFile(const std::string& path, float tileSize) {
         case ' ':
             temp_tiles.push_back(EMPTY);
             break;
-        case '+':
+        case 'b':
             temp_tiles.push_back(BREAKBLOCK);
             break;
-        case 'n':
+        case 's':
             temp_tiles.push_back(SPIKE);
             break;
         case '\n':      // end of line
@@ -93,20 +85,6 @@ void LevelSystem::loadLevelFile(const std::string& path, float tileSize) {
     buildSprites();
 }
 
-
-void LevelSystem::buildSprites() {
-    _sprites.clear();
-    for (size_t y = 0; y < LevelSystem::getHeight(); ++y) {
-        for (size_t x = 0; x < LevelSystem::getWidth(); ++x) {
-            auto s = make_unique<RectangleShape>();
-            s->setPosition(getTilePosition({ x, y }));
-            s->setSize(Vector2f(_tileSize, _tileSize));
-            s->setFillColor(getColor(getTile({ x, y })));
-            _sprites.push_back(move(s));
-        }
-    }
-}
-
 Vector2f LevelSystem::getTilePosition(Vector2ul p) {
     return (Vector2f(p.x, p.y) * _tileSize);
 }
@@ -118,24 +96,53 @@ LevelSystem::TILE LevelSystem::getTile(Vector2ul p) {
     return _tiles[(p.y * _width) + p.x];
 }
 
-LevelSystem::TILE LevelSystem::getTileAt(Vector2f v) {
-    auto a = v - _offset;
-    if (a.x < 0 || a.y < 0) {
-        throw string("Tile out of range ");
+void LevelSystem::buildSprites() {
+    
+    _sprites.clear();
+
+    for (size_t y = 0; y < LevelSystem::getHeight(); ++y) {
+        for (size_t x = 0; x < LevelSystem::getWidth(); ++x) {
+            
+            tileInfo s;
+            s.pos = (getTilePosition({ x, y }));
+
+            ls::TILE currTile = getTile({ x, y });
+            switch (currTile) {
+
+                case WALL:
+                    s.type = 1;
+                    _sprites.push_back(move(s));
+                    break;
+
+                case GRAVBLOCK:
+                    s.type = 2;
+                    _sprites.push_back(move(s));
+                    break;
+
+                case BREAKBLOCK:
+                    s.type = 3;
+                    _sprites.push_back(move(s));
+                    break;
+
+                case SPIKE:
+                    s.type = 4;
+                    _sprites.push_back(move(s));
+                    break;
+
+                case END:
+                    s.type = 5;
+                    _sprites.push_back(move(s));
+                    break;
+                default:
+                    break;
+
+            }
+        }
     }
-    return getTile(Vector2ul((v - _offset) / (_tileSize)));
 }
 
-size_t LevelSystem::getHeight() {
-    return ls::_height;
-}
-
-size_t LevelSystem::getWidth() {
-    return ls::_width;
-}
-
-void LevelSystem::Render(RenderWindow& window) {
-    for (size_t i = 0; i < _width * _height; ++i) {
-        window.draw(*_sprites[i]);
-    }
-}
+//void LevelSystem::Render(RenderWindow& window) {
+//    for (size_t i = 0; i < _width * _height; ++i) {
+//        //window.draw(*_sprites[i]);
+//    }
+//}

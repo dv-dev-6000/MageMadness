@@ -6,7 +6,7 @@ protected:
 
 public:
     //Constructor that takes a sprite
-    Tile(std::string type, sf::Vector2f pos);
+    Tile(int type, sf::Vector2f pos);
     //Update, virtual so can be overridden, but not pure virtual
     virtual void Update(const float& dt);
 };

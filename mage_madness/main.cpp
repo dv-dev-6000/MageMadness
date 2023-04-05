@@ -35,7 +35,7 @@ sf::View view;
 // textures 
 sf::Texture background;
 sf::Texture back2;
-sf::Texture tileTex;
+sf::Texture tileTex, breakTileTex, gravTileTex, spikeTileTex;
 //sprites
 sf::Sprite bkSprite;
 sf::Sprite bk2Sprite;
@@ -84,24 +84,39 @@ void Load() {
 	if (!back2.loadFromFile("res/img/TEST.png")) {
 		cerr << "Failed to load spritesheet!" << std::endl;
 	}
+	// load tile textures
 	if (!tileTex.loadFromFile("res/img/SpecialBlock3.png")) {
 		cerr << "Failed to load spritesheet!" << std::endl;
 	}
+	if (!breakTileTex.loadFromFile("res/img/SpecialBlock2.png")) {
+		cerr << "Failed to load spritesheet!" << std::endl;
+	}
+	if (!gravTileTex.loadFromFile("res/img/SpecialBlock.png")) {
+		cerr << "Failed to load spritesheet!" << std::endl;
+	}
+	if (!spikeTileTex.loadFromFile("res/img/SpikesBlue.png")) {
+		cerr << "Failed to load spritesheet!" << std::endl;
+	}
+
 	// set test image as sprite texture
-	bkSprite.setTexture(background);
-	bk2Sprite.setTexture(back2);
+	//bkSprite.setTexture(background);
+	//bk2Sprite.setTexture(back2);
 	// set values for source rect
-	bk2Sprite.setTextureRect(IntRect(Vector2(0, 0), Vector2(1920, 1080)));
-	bk2Sprite.setPosition({ 0,0 });
-	bkSprite.setTextureRect(IntRect(Vector2(0, 0), Vector2(800, 800)));
-	bkSprite.setPosition({ 0,0 });
+	//bk2Sprite.setTextureRect(IntRect(Vector2(0, 0), Vector2(1920, 1080)));
+	//bk2Sprite.setPosition({ 0,0 });
+	//bkSprite.setTextureRect(IntRect(Vector2(0, 0), Vector2(800, 800)));
+	//bkSprite.setPosition({ 0,0 });
 
 	//level load TEST
-	//ls::loadLevelFile("res/levels/maze.txt");
-	Tile tile1("type", Vector2f(0, 0));
-	tiles.push_back(tile1);
-	Tile tile2("type", Vector2f(64, 0));
-	tiles.push_back(tile2);
+	ls::loadLevelFile("res/levels/maze.txt");
+
+	for (int i = 0; i < ls::_sprites.size(); i++) {
+		
+		tileInfo currTile = ls::_sprites[i];
+		
+		Tile tile = Tile(currTile.type, currTile.pos);
+		tiles.push_back(tile);
+	}
 }
 
 /// <summary>
@@ -183,11 +198,11 @@ void Update(RenderWindow& window) {
 
 		if (event.type == sf::Event::KeyPressed)
 		{
-			// if S key pressed
-			if (event.key.code == Keyboard::S) {
-
-				bkSprite.setPosition(bkSprite.getPosition() + Vector2f(1, 1));
-			}
+			//// if S key pressed
+			//if (event.key.code == Keyboard::S) {
+			//
+			//	bkSprite.setPosition(bkSprite.getPosition() + Vector2f(1, 1));
+			//}
 			// if ESC key pressed
 			if (event.key.code == Keyboard::Escape) {
 
@@ -202,14 +217,14 @@ void Update(RenderWindow& window) {
 	}
 
 	// move when key held
-	if (Keyboard::isKeyPressed(Keyboard::Down)) {
-
-		if (bkSprite.getPosition().y < (1080 - 800)) {
-
-			bkSprite.setPosition(bkSprite.getPosition() + Vector2f(1, 1));
-		}
-		
-	}
+	//if (Keyboard::isKeyPressed(Keyboard::Down)) {
+	//
+	//	if (bkSprite.getPosition().y < (1080 - 800)) {
+	//
+	//		bkSprite.setPosition(bkSprite.getPosition() + Vector2f(1, 1));
+	//	}
+	//	
+	//}
 
 	
 
@@ -221,14 +236,13 @@ void Update(RenderWindow& window) {
 
 void Render(RenderWindow& window) {
 	// Draw Everything
-	window.draw(bk2Sprite);
-	window.draw(bkSprite);
+	
+	//window.draw(bk2Sprite);
+	//window.draw(bkSprite);
 
 	for (const auto s : tiles) {
 		window.draw(s);
 	}
-
-	//ls::Render(window);
 }
 
 int main() {

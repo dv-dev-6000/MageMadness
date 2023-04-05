@@ -2,9 +2,13 @@
 #pragma once
 #include <SFML/Graphics.hpp>
 
-// add constant vatiables here **
+// constant vatiables
 constexpr uint16_t hdGameWidth = 1920;
 constexpr uint16_t hdGameHeight = 1080;
 
 extern sf::Texture tileTex;
+extern sf::Texture breakTileTex;
+extern sf::Texture gravTileTex;
+extern sf::Texture spikeTileTex;
+//extern sf::Texture endTileTex;
 
