@@ -48,6 +48,7 @@ sf::Texture whiteBallTex;
 
 std::vector<Tile> tiles;
 std::vector<Projectile> projectiles;
+TeleProjectile tp = TeleProjectile();
 
 sf::Texture playerTex;
 Player player;
@@ -258,6 +259,13 @@ void Update(RenderWindow& window) {
 
 				projectiles[0].fireMe(player.getPosition(), mousePosition, 1);
 			}
+			if (event.mouseButton.button == sf::Mouse::Right) {
+
+				// map mouse coords to world coords
+				sf::Vector2f mousePosition = window.mapPixelToCoords(sf::Mouse::getPosition(window));
+
+				tp.fireMe(player.getPosition(), mousePosition, 1);
+			}
 		}
 
 		if (event.type == Event::Closed) {
@@ -268,6 +276,10 @@ void Update(RenderWindow& window) {
 
 	// update entities
 	player.Update(dt);
+	
+	if (tp.getState()) {
+		tp.Update(dt);
+	}
 
 	for (auto it = begin(projectiles); it != end(projectiles); ++it) {
 		if (it->getState()) {
@@ -296,6 +308,19 @@ void Update(RenderWindow& window) {
 
 				it->collision(dt, colRect, wBounds, 1);
 			}
+		}
+		// check tp projectile collision
+		// get projectile bounds
+		sf::FloatRect tpBounds = tp.getGlobalBounds();
+		// get collision data
+		optional tpCol = wBounds.findIntersection(tpBounds);
+
+		if (tp.getState() && tpCol) {
+
+			// get collision rect
+			FloatRect colRect = tpCol.value();
+
+			tp.collision(dt, colRect, wBounds, &player);
 		}
 
 
@@ -338,48 +363,7 @@ void Update(RenderWindow& window) {
 				player.setPosition({ pBounds.left, wBounds.top + wBounds.height + 5 });
 			}
 		}
-
-		// old collision code (works but not ideal)
-		// 
-		//if (collision) {
-		//
-		//	if (pBounds.top < wBounds.top												// collision on players bottom
-		//		&& pBounds.top + pBounds.height < wBounds.top + wBounds.height
-		//		&& pBounds.left < wBounds.left + wBounds.width
-		//		&& pBounds.left + pBounds.width > wBounds.left)
-		//	{
-		//		player.resetVelocity(player.getVelX(), 0);
-		//		player.resetJump();
-		//		player.setPosition({ pBounds.left, wBounds.top - pBounds.height });
-		//	}
-		//	else if (pBounds.left < wBounds.left										// collision on players right
-		//		&& pBounds.left + pBounds.width < wBounds.left + wBounds.width
-		//		&& pBounds.top < wBounds.top + wBounds.height
-		//		&& pBounds.top + pBounds.height > wBounds.top)
-		//	{
-		//		player.resetVelocity(0, player.getVelY());
-		//		player.setPosition({ wBounds.left - pBounds.width, pBounds.top });
-		//	}
-		//	else  if (pBounds.left > wBounds.left										// collision on players left
-		//		&& pBounds.left + pBounds.width > wBounds.left + wBounds.width
-		//		&& pBounds.top < wBounds.top + wBounds.height
-		//		&& pBounds.top + pBounds.height > wBounds.top)
-		//	{
-		//		player.resetVelocity(0, player.getVelY());
-		//		player.setPosition({ wBounds.left + wBounds.width, pBounds.top });
-		//	}
-		//	else if (pBounds.top > wBounds.top											// collision on players top
-		//		&& pBounds.top + pBounds.height > wBounds.top + wBounds.height
-		//		&& pBounds.left < wBounds.left + wBounds.width
-		//		&& pBounds.left + pBounds.width > wBounds.left)
-		//	{
-		//		player.resetVelocity(player.getVelX(), 0);
-		//		player.setPosition({ pBounds.left, wBounds.top + wBounds.height +5 });
-		//	}
-		//	
-		//}
 	}
-
 }
 
 
@@ -396,7 +380,9 @@ void Render(RenderWindow& window) {
 			window.draw(s);
 		}
 	}
-
+	if (tp.getState()) {
+		window.draw(tp);
+	}
 	window.draw(player);
 }
 

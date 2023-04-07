@@ -51,16 +51,20 @@ bool Projectile::getState() {
 	return _isActive;
 }
 
+void  Projectile::resetProjectile() {
+	_isActive = false;
+	_dest = { 0,0 };
+	_angleShot = 0;
+	_angleShot2 = 0;
+	_speed = 500;
+	setPosition({ 0,0 });
+}
+
 void Projectile::collision(const float& dt, sf::FloatRect collision, sf::FloatRect wall, int dmg) {
 
 	_hp -= dmg;
 	if (_hp <= 0) {
-		_isActive = false;
-		_dest = { 0,0 };
-		_angleShot = 0;
-		_angleShot2 = 0;
-		_speed = 500;
-		setPosition({0,0});
+		resetProjectile();
 	}
 	else {
 
@@ -71,4 +75,32 @@ void Projectile::collision(const float& dt, sf::FloatRect collision, sf::FloatRe
 		}
 	}
 
+}
+
+void TeleProjectile::collision(const float& dt, sf::FloatRect collision, sf::FloatRect wall, Player *player) {
+
+	sf::Vector2f newpos = { 0,0 };
+
+	if (collision.left == wall.left && collision.width < collision.height) // hit on walls left edge
+	{
+		newpos = { collision.left - player->getTextureRect().width, wall.top };
+	}
+	else if (collision.left + collision.width == wall.left + wall.width && collision.width < collision.height) // hit on walls right edge
+	{
+		newpos = { collision.left + collision.width, wall.top };
+	}
+	else if (collision.top == wall.top && collision.width > collision.height) // hit on walls top edge
+	{
+		newpos = { wall.left, collision.top - player->getTextureRect().height };
+	}
+	else if (collision.top + collision.height == wall.top + wall.height && collision.width > collision.height) // hit on walls bottom edge
+	{
+		newpos = { wall.left, collision.top + collision.height };
+	}
+
+	player->setPosition(newpos);
+	player->resetVelocity(0, 0);
+
+	_hp = 0;
+	resetProjectile();
 }
