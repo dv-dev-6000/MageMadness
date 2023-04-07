@@ -275,11 +275,32 @@ void Update(RenderWindow& window) {
 		}
 	}
 
-	// check player collision with walls
+	// check collision with walls
 	for (const auto s : tiles) {
-		sf::FloatRect pBounds = player.getGlobalBounds();
+
+		// get bounds for wall
 		sf::FloatRect wBounds = s.getGlobalBounds();
 
+		//check projectile collision
+		for (auto it = begin(projectiles); it != end(projectiles); ++it) {
+
+			// get projectile bounds
+			sf::FloatRect projBounds = it->getGlobalBounds();
+			// get collision data
+			optional collision = wBounds.findIntersection(projBounds);
+
+			if (it->getState() && collision) {
+				
+				// get collision rect
+				FloatRect colRect = collision.value();
+
+				it->collision(dt, colRect, wBounds, 1);
+			}
+		}
+
+
+		//check player collision 
+		sf::FloatRect pBounds = player.getGlobalBounds();
 		optional collision = wBounds.findIntersection(pBounds);
 
 		if (collision) {

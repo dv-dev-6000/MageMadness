@@ -21,4 +21,5 @@ public:
 
     void fireMe(sf::Vector2f startPos, sf::Vector2f destination, int hp);
     bool getState();
+    void collision(const float& dt, sf::FloatRect collision, sf::FloatRect wall, int dmg);
 };
