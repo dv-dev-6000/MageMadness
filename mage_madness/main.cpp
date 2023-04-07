@@ -4,6 +4,7 @@
 #include "LevelSystem.h"
 #include "tile.h"
 #include "player.h"
+#include "projectile.h"
 
 using namespace sf;
 using namespace std;
@@ -12,7 +13,7 @@ using namespace std;
 // Game Variables =======================================================================================================
 
 // list of game levels/scenes
-enum GameScene {
+enum class GameScene {
 
 	mainMenu,
 	tutorial_1,
@@ -25,8 +26,16 @@ enum GameScene {
 	level_5
 };
 
+// list of game states
+enum class GameState {
+
+	playing,
+	menu,
+};
+
 // var for current game scene
 GameScene currScene;
+GameState currState;
 
 // get desktop resolution info
 VideoMode desktop = VideoMode::getDesktopMode();
@@ -34,14 +43,11 @@ VideoMode desktop = VideoMode::getDesktopMode();
 sf::View view;
 
 // textures 
-sf::Texture background;
-sf::Texture back2;
 sf::Texture tileTex, breakTileTex, gravTileTex, spikeTileTex;
-//sprites
-sf::Sprite bkSprite;
-sf::Sprite bk2Sprite;
+sf::Texture whiteBallTex;
 
 std::vector<Tile> tiles;
+std::vector<Projectile> projectiles;
 
 sf::Texture playerTex;
 Player player;
@@ -56,7 +62,7 @@ void ResetWindow(RenderWindow& window) {
 	// enable or disable vsync - do at start of game, or via options menu
 	window.setVerticalSyncEnabled(true);
 	// cap fps 
-	window.setFramerateLimit(60);
+	window.setFramerateLimit(120);
 	// set window view
 	window.setView(view);
 }
@@ -68,10 +74,10 @@ void ResetWindow(RenderWindow& window) {
 /// initialise variables
 /// </summary>
 void Init() {
-
-	// set current game scene
-	currScene = mainMenu;
 	
+	// set current game scene
+	currScene = GameScene::mainMenu;
+	currState = GameState::playing;
 }
 
 // Load Content =========================================================================================================
@@ -81,13 +87,6 @@ void Init() {
 /// </summary>
 void Load() {
 
-	// load test images
-	if (!background.loadFromFile("res/img/testBackground.png")) {
-		cerr << "Failed to load spritesheet!" << std::endl;
-	}
-	if (!back2.loadFromFile("res/img/TEST.png")) {
-		cerr << "Failed to load spritesheet!" << std::endl;
-	}
 	// load tile textures
 	if (!tileTex.loadFromFile("res/img/SpecialBlock3.png")) {
 		cerr << "Failed to load spritesheet!" << std::endl;
@@ -102,18 +101,13 @@ void Load() {
 		cerr << "Failed to load spritesheet!" << std::endl;
 	}
 	// load player textures
-	if (!playerTex.loadFromFile("res/img/Player.png")) {
+	if (!playerTex.loadFromFile("res/img/PlayerSheet.png")) {
 		cerr << "Failed to load spritesheet!" << std::endl;
 	}
-
-	// set test image as sprite texture
-	//bkSprite.setTexture(background);
-	//bk2Sprite.setTexture(back2);
-	// set values for source rect
-	//bk2Sprite.setTextureRect(IntRect(Vector2(0, 0), Vector2(1920, 1080)));
-	//bk2Sprite.setPosition({ 0,0 });
-	//bkSprite.setTextureRect(IntRect(Vector2(0, 0), Vector2(800, 800)));
-	//bkSprite.setPosition({ 0,0 });
+	// load projectile textures
+	if (!whiteBallTex.loadFromFile("res/img/WhiteBall.png")) {
+		cerr << "Failed to load spritesheet!" << std::endl;
+	}
 
 	//level load TEST
 	ls::loadLevelFile("res/levels/maze.txt");
@@ -124,6 +118,13 @@ void Load() {
 
 		Tile tile = Tile(currTile.type, currTile.pos);
 		tiles.push_back(tile);
+	}
+
+	//load projectiles
+	for (int i = 0; i < 10; i++) {
+
+		Projectile p = Projectile();
+		projectiles.push_back(p);
 	}
 
 	// load player 
@@ -139,31 +140,31 @@ void Reload() {
 	// level logic
 	switch (currScene) {
 
-		case mainMenu:
+	case GameScene::mainMenu:
 
 			// main menu logic here
 
 			break;
 
-		case tutorial_1:
+		case GameScene::tutorial_1:
 
 			// tut 1 logic here
 
 			break;
 
-		case tutorial_2:
+		case GameScene::tutorial_2:
 
 			// tut 2 logic here
 
 			break;
 
-		case tutorial_3:
+		case GameScene::tutorial_3:
 
 			// tut 3 logic here
 
 			break;
 
-		case level_1:
+		case GameScene::level_1:
 
 			// level 1 logic here
 
@@ -190,8 +191,48 @@ void Update(RenderWindow& window) {
 	Event event;
 	while (window.pollEvent(event)) {
 		
+		// key pressed events
+		if (event.type == sf::Event::KeyPressed)
+		{
+			// player events if playing
+			if (currState == GameState::playing) {
+
+				// prep Jump
+				if (event.key.code == Keyboard::Space) { 
+
+					player.jumpPressed();
+				}
+				// flip player sprite
+				if (event.key.code == Keyboard::D) {
+
+					player.setTextureRect(IntRect(Vector2(0, 0), Vector2(45, 64)));
+				}
+				if (event.key.code == Keyboard::A) {
+
+					player.setTextureRect(sf::IntRect(Vector2(45, 0), Vector2(-45,64)));
+				}
+			}
+
+
+			if (event.key.code == Keyboard::Escape) {
+
+				window.close();
+			}
+		}
+
+		// key released events
 		if (event.type == sf::Event::KeyReleased)
 		{
+			// player events if playing
+			if (currState == GameState::playing) {
+
+				if (event.key.code == Keyboard::Space) {
+
+					player.jumpReleased();
+				}
+			}
+			
+
 			if (event.key.code == Keyboard::F1) {
 
 				// minimaize and change aspect ratio -- move to options menu
@@ -208,17 +249,14 @@ void Update(RenderWindow& window) {
 			}
 		}
 
-		if (event.type == sf::Event::KeyPressed)
+		if (event.type == sf::Event::MouseButtonReleased)
 		{
-			//// if S key pressed
-			//if (event.key.code == Keyboard::S) {
-			//
-			//	bkSprite.setPosition(bkSprite.getPosition() + Vector2f(1, 1));
-			//}
-			// if ESC key pressed
-			if (event.key.code == Keyboard::Escape) {
+			if (event.mouseButton.button == sf::Mouse::Left) {
 
-				window.close();
+				// map mouse coords to world coords
+				sf::Vector2f mousePosition = window.mapPixelToCoords(sf::Mouse::getPosition(window));
+
+				projectiles[0].fireMe(player.getPosition(), mousePosition, 1);
 			}
 		}
 
@@ -228,14 +266,13 @@ void Update(RenderWindow& window) {
 		}
 	}
 
-	// move when key held
-	if (Keyboard::isKeyPressed(Keyboard::Down)) {
-	
-		if (player.getPosition().y < (1080 - 64)) {
-	
-			player.setPosition(player.getPosition() + Vector2f(1, 1));
+	// update entities
+	player.Update(dt);
+
+	for (auto it = begin(projectiles); it != end(projectiles); ++it) {
+		if (it->getState()) {
+			it->Update(dt);
 		}
-		
 	}
 
 	// check player collision with walls
@@ -243,25 +280,100 @@ void Update(RenderWindow& window) {
 		sf::FloatRect pBounds = player.getGlobalBounds();
 		sf::FloatRect wBounds = s.getGlobalBounds();
 
-		if (wBounds.findIntersection(pBounds)) {
-			player.setPosition({ 100,100 });
+		optional collision = wBounds.findIntersection(pBounds);
+
+		if (collision) {
+
+			// get values for edges of collision rect [this rect represents the amount by which the player is intersecting with the tile]
+			float colLeft = collision.value().left;
+			float colRight = collision.value().left + collision.value().width;
+			float colTop = collision.value().top;
+			float colBottom = collision.value().top + collision.value().height;
+			// get values for edges of wall rect
+			float wallLeft = wBounds.left;
+			float wallRight = wBounds.left + wBounds.width;
+			float wallTop = wBounds.top;
+			float wallBottom = wBounds.top + wBounds.height;
+
+			if (colTop == wallTop && collision.value().width > collision.value().height) // players feet
+			{
+				player.resetVelocity(player.getVelX(), 0);
+				player.resetJump();
+				player.setPosition({ pBounds.left, wBounds.top - pBounds.height });
+			}
+			else if (colLeft == wallLeft && collision.value().width < collision.value().height) // players right
+			{
+				player.resetVelocity(0, player.getVelY());
+				player.setPosition({ wBounds.left - pBounds.width, pBounds.top });
+			}
+			else  if (colRight == wallRight && collision.value().width < collision.value().height) // players left
+			{
+				player.resetVelocity(0, player.getVelY());
+				player.setPosition({ wBounds.left + wBounds.width, pBounds.top });
+			}
+			else if (colBottom == wallBottom && collision.value().width > collision.value().height) // players head
+			{
+				player.resetVelocity(player.getVelX(), 0);
+				player.setPosition({ pBounds.left, wBounds.top + wBounds.height + 5 });
+			}
 		}
+
+		// old collision code (works but not ideal)
+		// 
+		//if (collision) {
+		//
+		//	if (pBounds.top < wBounds.top												// collision on players bottom
+		//		&& pBounds.top + pBounds.height < wBounds.top + wBounds.height
+		//		&& pBounds.left < wBounds.left + wBounds.width
+		//		&& pBounds.left + pBounds.width > wBounds.left)
+		//	{
+		//		player.resetVelocity(player.getVelX(), 0);
+		//		player.resetJump();
+		//		player.setPosition({ pBounds.left, wBounds.top - pBounds.height });
+		//	}
+		//	else if (pBounds.left < wBounds.left										// collision on players right
+		//		&& pBounds.left + pBounds.width < wBounds.left + wBounds.width
+		//		&& pBounds.top < wBounds.top + wBounds.height
+		//		&& pBounds.top + pBounds.height > wBounds.top)
+		//	{
+		//		player.resetVelocity(0, player.getVelY());
+		//		player.setPosition({ wBounds.left - pBounds.width, pBounds.top });
+		//	}
+		//	else  if (pBounds.left > wBounds.left										// collision on players left
+		//		&& pBounds.left + pBounds.width > wBounds.left + wBounds.width
+		//		&& pBounds.top < wBounds.top + wBounds.height
+		//		&& pBounds.top + pBounds.height > wBounds.top)
+		//	{
+		//		player.resetVelocity(0, player.getVelY());
+		//		player.setPosition({ wBounds.left + wBounds.width, pBounds.top });
+		//	}
+		//	else if (pBounds.top > wBounds.top											// collision on players top
+		//		&& pBounds.top + pBounds.height > wBounds.top + wBounds.height
+		//		&& pBounds.left < wBounds.left + wBounds.width
+		//		&& pBounds.left + pBounds.width > wBounds.left)
+		//	{
+		//		player.resetVelocity(player.getVelX(), 0);
+		//		player.setPosition({ pBounds.left, wBounds.top + wBounds.height +5 });
+		//	}
+		//	
+		//}
 	}
 
 }
-
 
 
 // Draw =================================================================================================================
 
 void Render(RenderWindow& window) {
 	// Draw Everything
-	
-	//window.draw(bk2Sprite);
-	//window.draw(bkSprite);
 
 	for (const auto s : tiles) {
 		window.draw(s);
+	}
+	for (auto s : projectiles) {
+		if (s.getState()) {
+			window.draw(s);
+		}
 	}
 
 	window.draw(player);

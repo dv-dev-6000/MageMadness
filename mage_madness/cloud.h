@@ -13,4 +13,5 @@ extern sf::Texture spikeTileTex;
 //extern sf::Texture endTileTex;
 
 extern sf::Texture playerTex;
+extern sf::Texture whiteBallTex;
 
