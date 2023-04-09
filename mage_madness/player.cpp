@@ -15,7 +15,7 @@ const Mouse::Button mouseControls[2] = {
     Mouse::Right,		    // M right
 };
 
-Player::Player() : Sprite() {
+Player::Player() : Entity() {
 
 	setTextureRect(IntRect(Vector2(0, 0), Vector2(45, 64)));
 	setTexture(playerTex);

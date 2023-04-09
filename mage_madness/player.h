@@ -1,7 +1,8 @@
 #pragma once
+#include "entity_management.h"
 #include <SFML/Graphics.hpp>
 
-class Player : public sf::Sprite {
+class Player : public Entity {
 protected:
 
     float _speed;

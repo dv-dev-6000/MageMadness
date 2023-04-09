@@ -1,8 +1,9 @@
 #pragma once
 #include <SFML/Graphics.hpp>
+#include "entity_management.h"
 #include "player.h"
 
-class Projectile : public sf::Sprite {
+class Projectile : public Entity {
 protected:
 
     bool _isActive;

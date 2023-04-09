@@ -6,7 +6,7 @@ using namespace sf;
 using namespace std;
 
 
-Projectile::Projectile() : Sprite() {
+Projectile::Projectile() : Entity() {
 
 	setTextureRect(IntRect(Vector2(0, 0), Vector2(16,16)));
 	setTexture(whiteBallTex);

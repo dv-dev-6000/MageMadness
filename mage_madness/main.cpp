@@ -2,6 +2,7 @@
 #include <iostream>
 #include "cloud.h"
 #include "LevelSystem.h"
+#include "entity_management.h"
 #include "tile.h"
 #include "player.h"
 #include "projectile.h"
@@ -32,6 +33,9 @@ enum class GameState {
 	playing,
 	menu,
 };
+
+EntityManager entityManager;
+EntityManager tileManager;
 
 // var for current game scene
 GameScene currScene;
@@ -77,7 +81,7 @@ void ResetWindow(RenderWindow& window) {
 void Init() {
 	
 	// set current game scene
-	currScene = GameScene::mainMenu;
+	currScene = GameScene::tutorial_1;
 	currState = GameState::playing;
 }
 
@@ -288,10 +292,13 @@ void Update(RenderWindow& window) {
 	}
 
 	// check collision with walls
-	for (const auto s : tiles) {
+	for (auto s = begin(tiles); s != end(tiles); ++s) {
+
+		// update walls
+		s->Update(dt);
 
 		// get bounds for wall
-		sf::FloatRect wBounds = s.getGlobalBounds();
+		sf::FloatRect wBounds = s->getGlobalBounds();
 
 		//check projectile collision
 		for (auto it = begin(projectiles); it != end(projectiles); ++it) {
@@ -303,12 +310,38 @@ void Update(RenderWindow& window) {
 
 			if (it->getState() && collision) {
 				
+				// if breakblock then move offscreen
+				if (s->getType() == 3) {
+					s->setPosition({ -128, -128 });
+				}
 				// get collision rect
 				FloatRect colRect = collision.value();
-
+				// trigger collision effect
 				it->collision(dt, colRect, wBounds, 1);
 			}
 		}
+
+		// check gravblocks
+		if (s->getType() == 2) {
+			// tmp collision bool
+			bool isColliding = false;
+			// collision rect 2px lower than current position, used to check for potential collision under block
+			FloatRect nextPos = { {s->getGlobalBounds().getPosition().x, s->getGlobalBounds().getPosition().y + 2}, {s->getGlobalBounds().getSize()} };
+			// check current grav tile against all tiles in level
+			for (auto s2 = begin(tiles); s2 != end(tiles); ++s2) {
+				// exculde checking tile for collision with itself
+				if (s != s2) {
+					// if the current tiles next position will cause a collison, set tmp colliding to true
+					if (s2->getGlobalBounds().findIntersection(nextPos)) {
+						isColliding = true;
+						break;
+					}
+				}
+			}
+			s->setColliding(isColliding);
+		}
+		
+
 		// check tp projectile collision
 		// get projectile bounds
 		sf::FloatRect tpBounds = tp.getGlobalBounds();
@@ -341,26 +374,34 @@ void Update(RenderWindow& window) {
 			float wallTop = wBounds.top;
 			float wallBottom = wBounds.top + wBounds.height;
 
-			if (colTop == wallTop && collision.value().width > collision.value().height) // players feet
-			{
-				player.resetVelocity(player.getVelX(), 0);
-				player.resetJump();
-				player.setPosition({ pBounds.left, wBounds.top - pBounds.height });
+			// if spiked then kill else collide
+			if (s->getType() == 4) {
+				player.setPosition({ 64,64 });
+				player.resetVelocity(0, 0);
 			}
-			else if (colLeft == wallLeft && collision.value().width < collision.value().height) // players right
-			{
-				player.resetVelocity(0, player.getVelY());
-				player.setPosition({ wBounds.left - pBounds.width, pBounds.top });
-			}
-			else  if (colRight == wallRight && collision.value().width < collision.value().height) // players left
-			{
-				player.resetVelocity(0, player.getVelY());
-				player.setPosition({ wBounds.left + wBounds.width, pBounds.top });
-			}
-			else if (colBottom == wallBottom && collision.value().width > collision.value().height) // players head
-			{
-				player.resetVelocity(player.getVelX(), 0);
-				player.setPosition({ pBounds.left, wBounds.top + wBounds.height + 5 });
+			else {
+
+				if (colTop == wallTop && collision.value().width > collision.value().height) // players feet
+				{
+					player.resetVelocity(player.getVelX(), 0);
+					player.resetJump();
+					player.setPosition({ pBounds.left, wBounds.top - pBounds.height });
+				}
+				else if (colLeft == wallLeft && collision.value().width < collision.value().height) // players right
+				{
+					player.resetVelocity(0, player.getVelY());
+					player.setPosition({ wBounds.left - pBounds.width, pBounds.top });
+				}
+				else  if (colRight == wallRight && collision.value().width < collision.value().height) // players left
+				{
+					player.resetVelocity(0, player.getVelY());
+					player.setPosition({ wBounds.left + wBounds.width, pBounds.top });
+				}
+				else if (colBottom == wallBottom && collision.value().width > collision.value().height) // players head
+				{
+					player.resetVelocity(player.getVelX(), 0);
+					player.setPosition({ pBounds.left, wBounds.top + wBounds.height + 5 });
+				}
 			}
 		}
 	}
@@ -384,6 +425,8 @@ void Render(RenderWindow& window) {
 		window.draw(tp);
 	}
 	window.draw(player);
+
+	//Renderer::render;
 }
 
 int main() {
@@ -394,6 +437,7 @@ int main() {
 	// set initial window properties
 	RenderWindow window(VideoMode(desktop.size, desktop.bitsPerPixel), "MageMadness", sf::Style::Fullscreen);
 	ResetWindow(window);
+	Renderer::initialise(window);
 
 	Init();
 	Load();
