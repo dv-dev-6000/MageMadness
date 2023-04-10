@@ -63,6 +63,8 @@ void Player::Update(const float& dt) {
 
 
     _velocityY += _gravity;
+
+    Entity::Update(dt);
 }
 
 void Player::projectilePressed() {

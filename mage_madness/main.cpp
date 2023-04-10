@@ -34,8 +34,13 @@ enum class GameState {
 	menu,
 };
 
+// entities & lists  ** integrate to entity management system
 EntityManager entityManager;
-EntityManager tileManager;
+
+std::vector<shared_ptr<Tile>> tiles;
+std::vector<shared_ptr<Projectile>> projectiles;
+std::shared_ptr<Player> player;
+std::shared_ptr<TeleProjectile> tp;
 
 // var for current game scene
 GameScene currScene;
@@ -49,13 +54,8 @@ sf::View view;
 // textures 
 sf::Texture tileTex, breakTileTex, gravTileTex, spikeTileTex;
 sf::Texture whiteBallTex;
-
-std::vector<Tile> tiles;
-std::vector<Projectile> projectiles;
-TeleProjectile tp = TeleProjectile();
-
 sf::Texture playerTex;
-Player player;
+
 
 // Game Methods ===========================================================================================================
 
@@ -92,6 +92,8 @@ void Init() {
 /// </summary>
 void Load() {
 
+	
+
 	// load tile textures
 	if (!tileTex.loadFromFile("res/img/SpecialBlock3.png")) {
 		cerr << "Failed to load spritesheet!" << std::endl;
@@ -114,27 +116,49 @@ void Load() {
 		cerr << "Failed to load spritesheet!" << std::endl;
 	}
 
-	//level load TEST
+	// level load
 	ls::loadLevelFile("res/levels/maze.txt");
-
+	// add tiles to tile list
 	for (int i = 0; i < ls::_sprites.size(); i++) {
 
 		tileInfo currTile = ls::_sprites[i];
 
-		Tile tile = Tile(currTile.type, currTile.pos);
+		std::shared_ptr<Tile> tile = std::make_shared<Tile>(currTile.type, currTile.pos);
 		tiles.push_back(tile);
+		entityManager.list.push_back(tile);
 	}
+	// add tiles to entity management
+	//for (auto it = begin(tiles); it != end(tiles); ++it) {
+	//
+	//	entityManager.list.push_back(std::make_shared<Tile>((*it)));
+	//}
+
 
 	//load projectiles
 	for (int i = 0; i < 10; i++) {
 
-		Projectile p = Projectile();
+		std::shared_ptr<Projectile> p = std::make_shared<Projectile>();
 		projectiles.push_back(p);
+		entityManager.list.push_back(p);
 	}
+	// add projectiles to entity management
+	//for (auto it = begin(projectiles); it != end(projectiles); ++it) {
+	//
+	//	entityManager.list.push_back(std::make_shared<Projectile>((*it)));
+	//}
 
 	// load player 
-	player.setTexture(playerTex);
-	player.setPosition({ 100,100 });
+	player = std::make_shared<Player>();
+	// add player to em list
+	entityManager.list.push_back(player);
+	// set player values ** move to level reset 
+	player->setTexture(playerTex);
+	player->setPosition({ 100,100 });
+
+	// load single tele projectile
+	tp = std::make_shared<TeleProjectile>();
+	// add tp to em list
+	entityManager.list.push_back(tp);
 }
 
 /// <summary>
@@ -205,16 +229,16 @@ void Update(RenderWindow& window) {
 				// prep Jump
 				if (event.key.code == Keyboard::Space) { 
 
-					player.jumpPressed();
+					player->jumpPressed();
 				}
 				// flip player sprite
 				if (event.key.code == Keyboard::D) {
 
-					player.setTextureRect(IntRect(Vector2(0, 0), Vector2(45, 64)));
+					player->setTextureRect(IntRect(Vector2(0, 0), Vector2(45, 64)));
 				}
 				if (event.key.code == Keyboard::A) {
 
-					player.setTextureRect(sf::IntRect(Vector2(45, 0), Vector2(-45,64)));
+					player->setTextureRect(sf::IntRect(Vector2(45, 0), Vector2(-45,64)));
 				}
 			}
 
@@ -233,7 +257,7 @@ void Update(RenderWindow& window) {
 
 				if (event.key.code == Keyboard::Space) {
 
-					player.jumpReleased();
+					player->jumpReleased();
 				}
 			}
 			
@@ -261,14 +285,14 @@ void Update(RenderWindow& window) {
 				// map mouse coords to world coords
 				sf::Vector2f mousePosition = window.mapPixelToCoords(sf::Mouse::getPosition(window));
 
-				projectiles[0].fireMe(player.getPosition(), mousePosition, 1);
+				projectiles[0]->fireMe(player->getPosition(), mousePosition, 1);
 			}
 			if (event.mouseButton.button == sf::Mouse::Right) {
 
 				// map mouse coords to world coords
 				sf::Vector2f mousePosition = window.mapPixelToCoords(sf::Mouse::getPosition(window));
 
-				tp.fireMe(player.getPosition(), mousePosition, 1);
+				tp->fireMe(player->getPosition(), mousePosition, 1);
 			}
 		}
 
@@ -279,86 +303,89 @@ void Update(RenderWindow& window) {
 	}
 
 	// update entities
-	player.Update(dt);
-	
-	if (tp.getState()) {
-		tp.Update(dt);
-	}
+	entityManager.update(dt);
 
-	for (auto it = begin(projectiles); it != end(projectiles); ++it) {
-		if (it->getState()) {
-			it->Update(dt);
-		}
-	}
+	//player.Update(dt);
+	
+	//if (tp.getState()) {
+	//	tp.Update(dt);
+	//}
+
+	//for (auto it = begin(projectiles); it != end(projectiles); ++it) {
+	//
+	//	if (it->getState()) {
+	//		it->Update(dt);
+	//	}
+	//}
 
 	// check collision with walls
 	for (auto s = begin(tiles); s != end(tiles); ++s) {
 
 		// update walls
-		s->Update(dt);
+		//s->Update(dt);
 
 		// get bounds for wall
-		sf::FloatRect wBounds = s->getGlobalBounds();
+		sf::FloatRect wBounds = (*s)->getGlobalBounds();
 
 		//check projectile collision
 		for (auto it = begin(projectiles); it != end(projectiles); ++it) {
 
 			// get projectile bounds
-			sf::FloatRect projBounds = it->getGlobalBounds();
+			sf::FloatRect projBounds = (*it)->getGlobalBounds();
 			// get collision data
 			optional collision = wBounds.findIntersection(projBounds);
 
-			if (it->getState() && collision) {
+			if ((*it)->getState() && collision) {
 				
 				// if breakblock then move offscreen
-				if (s->getType() == 3) {
-					s->setPosition({ -128, -128 });
+				if ((*s)->getType() == 3) {
+					(*s)->setPosition({ -128, -128 });
 				}
 				// get collision rect
 				FloatRect colRect = collision.value();
 				// trigger collision effect
-				it->collision(dt, colRect, wBounds, 1);
+				(*it)->collision(dt, colRect, wBounds, 1);
 			}
 		}
 
 		// check gravblocks
-		if (s->getType() == 2) {
+		if ((*s)->getType() == 2) {
 			// tmp collision bool
 			bool isColliding = false;
 			// collision rect 2px lower than current position, used to check for potential collision under block
-			FloatRect nextPos = { {s->getGlobalBounds().getPosition().x, s->getGlobalBounds().getPosition().y + 2}, {s->getGlobalBounds().getSize()} };
+			FloatRect nextPos = { {(*s)->getGlobalBounds().getPosition().x, (*s)->getGlobalBounds().getPosition().y + 2}, {(*s)->getGlobalBounds().getSize()} };
 			// check current grav tile against all tiles in level
 			for (auto s2 = begin(tiles); s2 != end(tiles); ++s2) {
 				// exculde checking tile for collision with itself
 				if (s != s2) {
 					// if the current tiles next position will cause a collison, set tmp colliding to true
-					if (s2->getGlobalBounds().findIntersection(nextPos)) {
+					if ((*s2)->getGlobalBounds().findIntersection(nextPos)) {
 						isColliding = true;
 						break;
 					}
 				}
 			}
-			s->setColliding(isColliding);
+			(*s)->setColliding(isColliding);
 		}
 		
 
 		// check tp projectile collision
 		// get projectile bounds
-		sf::FloatRect tpBounds = tp.getGlobalBounds();
+		sf::FloatRect tpBounds = tp->getGlobalBounds();
 		// get collision data
 		optional tpCol = wBounds.findIntersection(tpBounds);
 
-		if (tp.getState() && tpCol) {
+		if (tp->getState() && tpCol) {
 
 			// get collision rect
 			FloatRect colRect = tpCol.value();
 
-			tp.collision(dt, colRect, wBounds, &player);
+			tp->collision(dt, colRect, wBounds, player);
 		}
 
 
 		//check player collision 
-		sf::FloatRect pBounds = player.getGlobalBounds();
+		sf::FloatRect pBounds = player->getGlobalBounds();
 		optional collision = wBounds.findIntersection(pBounds);
 
 		if (collision) {
@@ -375,32 +402,32 @@ void Update(RenderWindow& window) {
 			float wallBottom = wBounds.top + wBounds.height;
 
 			// if spiked then kill else collide
-			if (s->getType() == 4) {
-				player.setPosition({ 64,64 });
-				player.resetVelocity(0, 0);
+			if ((*s)->getType() == 4) {
+				player->setPosition({ 64,64 });
+				player->resetVelocity(0, 0);
 			}
 			else {
 
 				if (colTop == wallTop && collision.value().width > collision.value().height) // players feet
 				{
-					player.resetVelocity(player.getVelX(), 0);
-					player.resetJump();
-					player.setPosition({ pBounds.left, wBounds.top - pBounds.height });
+					player->resetVelocity(player->getVelX(), 0);
+					player->resetJump();
+					player->setPosition({ pBounds.left, wBounds.top - pBounds.height });
 				}
 				else if (colLeft == wallLeft && collision.value().width < collision.value().height) // players right
 				{
-					player.resetVelocity(0, player.getVelY());
-					player.setPosition({ wBounds.left - pBounds.width, pBounds.top });
+					player->resetVelocity(0, player->getVelY());
+					player->setPosition({ wBounds.left - pBounds.width, pBounds.top });
 				}
 				else  if (colRight == wallRight && collision.value().width < collision.value().height) // players left
 				{
-					player.resetVelocity(0, player.getVelY());
-					player.setPosition({ wBounds.left + wBounds.width, pBounds.top });
+					player->resetVelocity(0, player->getVelY());
+					player->setPosition({ wBounds.left + wBounds.width, pBounds.top });
 				}
 				else if (colBottom == wallBottom && collision.value().width > collision.value().height) // players head
 				{
-					player.resetVelocity(player.getVelX(), 0);
-					player.setPosition({ pBounds.left, wBounds.top + wBounds.height + 5 });
+					player->resetVelocity(player->getVelX(), 0);
+					player->setPosition({ pBounds.left, wBounds.top + wBounds.height + 5 });
 				}
 			}
 		}
@@ -414,17 +441,17 @@ void Render(RenderWindow& window) {
 	// Draw Everything
 
 	for (const auto s : tiles) {
-		window.draw(s);
+		window.draw(*s);
 	}
 	for (auto s : projectiles) {
-		if (s.getState()) {
-			window.draw(s);
+		if ((*s).getState()) {
+			window.draw(*s);
 		}
 	}
-	if (tp.getState()) {
-		window.draw(tp);
+	if (tp->getState()) {
+		window.draw(*tp);
 	}
-	window.draw(player);
+	window.draw(*player);
 
 	//Renderer::render;
 }

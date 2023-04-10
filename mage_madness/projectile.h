@@ -21,7 +21,7 @@ public:
     //Constructor
     Projectile();
     //Update, virtual so can be overridden, but not pure virtual
-    virtual void Update(const float& dt);
+    virtual void Update(const float& dt) override;
 
     void fireMe(sf::Vector2f startPos, sf::Vector2f destination, int hp);
     bool getState();
@@ -34,5 +34,5 @@ protected:
 public:
 
 
-    void collision(const float& dt, sf::FloatRect collision, sf::FloatRect wall, Player *player);
+    void collision(const float& dt, sf::FloatRect collision, sf::FloatRect wall, std::shared_ptr<Player> player);
 };

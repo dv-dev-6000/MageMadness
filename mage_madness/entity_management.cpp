@@ -6,7 +6,7 @@ using namespace std;
 using namespace sf;
 
 // EntityManager -------------------------------------------------
-void EntityManager::update(double dt) {
+void EntityManager::update(const float& dt) {
 	for (auto& e : list) {
 		e->Update(dt);
 	}
@@ -14,14 +14,14 @@ void EntityManager::update(double dt) {
 
 void EntityManager::render(sf::RenderWindow& window) {
 	for (const auto& e : list) {
-		e->Render(window);
+		//e->Render(window);
 	}
 }
 
 
 // Entity Class --------------------------------------------------
 Entity::Entity() {};
-void Entity::Update(const double dt) { }
+void Entity::Update(const float& dt) { }
 void Entity::Render(sf::RenderWindow& window) { }
 
 

@@ -23,7 +23,7 @@ public:
     Player();
 
     //Update, virtual so can be overridden, but not pure virtual
-    virtual void Update(const float& dt);
+    void Update(const float& dt) override;
 
     void resetJump();
     void resetVelocity(float x, float y);

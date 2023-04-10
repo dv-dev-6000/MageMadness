@@ -51,6 +51,8 @@ void Tile::Update(const float& dt) {
 
 		move({ 0, 200 * dt });
 	}
+
+	Entity::Update(dt);
 }
 
 int Tile::getType(){

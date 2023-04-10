@@ -9,13 +9,16 @@ class Entity : public sf::Sprite{
 protected:
     Entity();
 public:
-	virtual void Update(const double dt);
+
+    virtual ~Entity() = default;
+
+	virtual void Update(const float& dt);
 	virtual void Render(sf::RenderWindow& window);
 };
 
 struct EntityManager {
 	std::vector<std::shared_ptr<Entity>> list;
-	void update(double dt);
+	void update(const float& dt);
 	void render(sf::RenderWindow& window);
 };
 

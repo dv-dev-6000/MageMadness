@@ -22,16 +22,18 @@ Projectile::Projectile() : Entity() {
 
 void Projectile::Update(const float& dt) {
 
-	
-	if (_hp == 2) {
-		move({ (cos(_angleShot) * _speed) * dt, 0 });
-		move({ 0, (sin(_angleShot) * _speed) * dt });
+	if (getState()) {
+		if (_hp == 2) {
+			move({ (cos(_angleShot) * _speed) * dt, 0 });
+			move({ 0, (sin(_angleShot) * _speed) * dt });
+		}
+		else {
+			move({ (cos(_angleShot2) * _speed) * dt, 0 });
+			move({ 0, (sin(_angleShot2) * _speed) * dt });
+		}
 	}
-	else {
-		move({ (cos(_angleShot2) * _speed) * dt, 0 });
-		move({ 0, (sin(_angleShot2) * _speed) * dt });
-	}
-	
+
+	Entity::Update(dt);
 }
 
 
@@ -77,7 +79,7 @@ void Projectile::collision(const float& dt, sf::FloatRect collision, sf::FloatRe
 
 }
 
-void TeleProjectile::collision(const float& dt, sf::FloatRect collision, sf::FloatRect wall, Player *player) {
+void TeleProjectile::collision(const float& dt, sf::FloatRect collision, sf::FloatRect wall, std::shared_ptr<Player> player) {
 
 	sf::Vector2f newpos = { 0,0 };
 

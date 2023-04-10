@@ -12,7 +12,7 @@ public:
     //Constructor that takes a sprite
     Tile(int type, sf::Vector2f pos);
     //Update, virtual so can be overridden, but not pure virtual
-    virtual void Update(const float& dt);
+    void Update(const float& dt) override;
 
     int getType();
     bool getColliding();
