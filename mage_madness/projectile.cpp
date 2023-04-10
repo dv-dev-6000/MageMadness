@@ -79,6 +79,11 @@ void Projectile::collision(const float& dt, sf::FloatRect collision, sf::FloatRe
 
 }
 
+void Projectile::Render(sf::RenderWindow& window)
+{
+	Renderer::queue(this);
+}
+
 void TeleProjectile::collision(const float& dt, sf::FloatRect collision, sf::FloatRect wall, std::shared_ptr<Player> player) {
 
 	sf::Vector2f newpos = { 0,0 };

@@ -67,3 +67,7 @@ void Tile::setColliding(bool value) {
 	_gBlockColliding = value;
 }
 
+void Tile::Render(sf::RenderWindow& window)
+{
+	Renderer::queue(this);
+}

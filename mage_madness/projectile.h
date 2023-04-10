@@ -20,8 +20,9 @@ public:
 
     //Constructor
     Projectile();
-    //Update, virtual so can be overridden, but not pure virtual
+    //Update
     virtual void Update(const float& dt) override;
+    virtual void Render(sf::RenderWindow& window) override;
 
     void fireMe(sf::Vector2f startPos, sf::Vector2f destination, int hp);
     bool getState();

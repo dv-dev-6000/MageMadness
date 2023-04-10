@@ -115,3 +115,8 @@ float Player::getVelX() {
 float Player::getVelY() {
     return _velocityY;
 }
+
+void Player::Render(sf::RenderWindow& window)
+{
+    Renderer::queue(this);
+}

@@ -11,8 +11,9 @@ protected:
 public:
     //Constructor that takes a sprite
     Tile(int type, sf::Vector2f pos);
-    //Update, virtual so can be overridden, but not pure virtual
+    //Update
     void Update(const float& dt) override;
+    void Render(sf::RenderWindow& window) override;
 
     int getType();
     bool getColliding();

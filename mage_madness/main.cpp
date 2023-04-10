@@ -127,12 +127,6 @@ void Load() {
 		tiles.push_back(tile);
 		entityManager.list.push_back(tile);
 	}
-	// add tiles to entity management
-	//for (auto it = begin(tiles); it != end(tiles); ++it) {
-	//
-	//	entityManager.list.push_back(std::make_shared<Tile>((*it)));
-	//}
-
 
 	//load projectiles
 	for (int i = 0; i < 10; i++) {
@@ -141,11 +135,6 @@ void Load() {
 		projectiles.push_back(p);
 		entityManager.list.push_back(p);
 	}
-	// add projectiles to entity management
-	//for (auto it = begin(projectiles); it != end(projectiles); ++it) {
-	//
-	//	entityManager.list.push_back(std::make_shared<Projectile>((*it)));
-	//}
 
 	// load player 
 	player = std::make_shared<Player>();
@@ -305,24 +294,9 @@ void Update(RenderWindow& window) {
 	// update entities
 	entityManager.update(dt);
 
-	//player.Update(dt);
-	
-	//if (tp.getState()) {
-	//	tp.Update(dt);
-	//}
-
-	//for (auto it = begin(projectiles); it != end(projectiles); ++it) {
-	//
-	//	if (it->getState()) {
-	//		it->Update(dt);
-	//	}
-	//}
 
 	// check collision with walls
 	for (auto s = begin(tiles); s != end(tiles); ++s) {
-
-		// update walls
-		//s->Update(dt);
 
 		// get bounds for wall
 		sf::FloatRect wBounds = (*s)->getGlobalBounds();
@@ -440,20 +414,8 @@ void Update(RenderWindow& window) {
 void Render(RenderWindow& window) {
 	// Draw Everything
 
-	for (const auto s : tiles) {
-		window.draw(*s);
-	}
-	for (auto s : projectiles) {
-		if ((*s).getState()) {
-			window.draw(*s);
-		}
-	}
-	if (tp->getState()) {
-		window.draw(*tp);
-	}
-	window.draw(*player);
-
-	//Renderer::render;
+	entityManager.render(window);
+	Renderer::render();
 }
 
 int main() {

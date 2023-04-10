@@ -14,7 +14,7 @@ void EntityManager::update(const float& dt) {
 
 void EntityManager::render(sf::RenderWindow& window) {
 	for (const auto& e : list) {
-		//e->Render(window);
+		e->Render(window);
 	}
 }
 

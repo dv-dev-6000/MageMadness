@@ -24,6 +24,7 @@ public:
 
     //Update, virtual so can be overridden, but not pure virtual
     void Update(const float& dt) override;
+    void Render(sf::RenderWindow& window) override;
 
     void resetJump();
     void resetVelocity(float x, float y);
