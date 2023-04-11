@@ -10,6 +10,8 @@
 using namespace sf;
 using namespace std;
 
+// Forward Declaration for functions ====================================================================================
+void Reload();
 
 // Game Variables =======================================================================================================
 
@@ -51,6 +53,10 @@ VideoMode desktop = VideoMode::getDesktopMode();
 // create view object (used to scale content with window size and adjust aspect ratio) 
 sf::View view;
 
+// Pixel Font
+Font pixFont;
+Text titleText;
+
 // textures 
 sf::Texture tileTex, breakTileTex, gravTileTex, spikeTileTex;
 sf::Texture whiteBallTex;
@@ -81,7 +87,7 @@ void ResetWindow(RenderWindow& window) {
 void Init() {
 	
 	// set current game scene
-	currScene = GameScene::tutorial_1;
+	currScene = GameScene::mainMenu;
 	currState = GameState::playing;
 }
 
@@ -91,8 +97,6 @@ void Init() {
 /// Initial load - called on start up
 /// </summary>
 void Load() {
-
-	
 
 	// load tile textures
 	if (!tileTex.loadFromFile("res/img/SpecialBlock3.png")) {
@@ -116,38 +120,10 @@ void Load() {
 		cerr << "Failed to load spritesheet!" << std::endl;
 	}
 
-	// level load
-	ls::loadLevelFile("res/levels/maze.txt");
-	// add tiles to tile list
-	for (int i = 0; i < ls::_sprites.size(); i++) {
+	pixFont.loadFromFile("res/fonts/PressStart2P-Regular.ttf");
+	titleText.setFont(pixFont);
 
-		tileInfo currTile = ls::_sprites[i];
-
-		std::shared_ptr<Tile> tile = std::make_shared<Tile>(currTile.type, currTile.pos);
-		tiles.push_back(tile);
-		entityManager.list.push_back(tile);
-	}
-
-	//load projectiles
-	for (int i = 0; i < 10; i++) {
-
-		std::shared_ptr<Projectile> p = std::make_shared<Projectile>();
-		projectiles.push_back(p);
-		entityManager.list.push_back(p);
-	}
-
-	// load player 
-	player = std::make_shared<Player>();
-	// add player to em list
-	entityManager.list.push_back(player);
-	// set player values ** move to level reset 
-	player->setTexture(playerTex);
-	player->setPosition({ 100,100 });
-
-	// load single tele projectile
-	tp = std::make_shared<TeleProjectile>();
-	// add tp to em list
-	entityManager.list.push_back(tp);
+	Reload();
 }
 
 /// <summary>
@@ -155,12 +131,37 @@ void Load() {
 /// </summary>
 void Reload() {
 
-	// level logic
+	// clear lists--------------------------------------------------------
+	tiles.clear();
+	projectiles.clear();
+	entityManager.list.clear();
+	titleText.setString(" ");
+
+	// re-populate lists -------------------------------------------------
+	// load player + add player to em list
+	player = std::make_shared<Player>();
+	entityManager.list.push_back(player);
+	// load projectiles 
+	for (int i = 0; i < 10; i++) {
+
+		std::shared_ptr<Projectile> p = std::make_shared<Projectile>();
+		projectiles.push_back(p);
+		entityManager.list.push_back(p);
+	}
+	// load single tele projectile + add tp to em list
+	tp = std::make_shared<TeleProjectile>();
+	entityManager.list.push_back(tp);
+
+	// level logic -------------------------------------------------------
 	switch (currScene) {
 
-	case GameScene::mainMenu:
+		case GameScene::mainMenu:
 
 			// main menu logic here
+
+			titleText.setCharacterSize(64);
+			titleText.setString("Mage Madness");
+			titleText.setPosition({ (view.getSize().x * .5f) - (titleText.getLocalBounds().width * .5f), (view.getSize().y * .5f) - (titleText.getLocalBounds().height * .5f) });
 
 			break;
 
@@ -168,11 +169,43 @@ void Reload() {
 
 			// tut 1 logic here
 
+			// level load
+			ls::loadLevelFile("res/levels/tutOne.txt");
+			// add tiles to tile list
+			for (int i = 0; i < ls::_sprites.size(); i++) {
+
+				tileInfo currTile = ls::_sprites[i];
+
+				std::shared_ptr<Tile> tile = std::make_shared<Tile>(currTile.type, currTile.pos);
+				tiles.push_back(tile);
+				entityManager.list.push_back(tile);
+			}
+
+			// set player values
+			player->setTexture(playerTex);
+			player->setPosition({ 100,100 });
+
 			break;
 
 		case GameScene::tutorial_2:
 
 			// tut 2 logic here
+
+			// level load
+			ls::loadLevelFile("res/levels/tutTwo.txt");
+			// add tiles to tile list
+			for (int i = 0; i < ls::_sprites.size(); i++) {
+
+				tileInfo currTile = ls::_sprites[i];
+
+				std::shared_ptr<Tile> tile = std::make_shared<Tile>(currTile.type, currTile.pos);
+				tiles.push_back(tile);
+				entityManager.list.push_back(tile);
+			}
+
+			// set player values
+			player->setTexture(playerTex);
+			player->setPosition({ 100,100 });
 
 			break;
 
@@ -248,6 +281,18 @@ void Update(RenderWindow& window) {
 
 					player->jumpReleased();
 				}
+
+				// TESTING SCENE SKIP
+				if (event.key.code == Keyboard::Right) {
+
+					if (currScene == GameScene::mainMenu) {
+						currScene = GameScene::tutorial_1;
+					}
+					else {
+						currScene = GameScene::tutorial_2;
+					}
+					Reload();
+				}
 			}
 			
 
@@ -292,8 +337,9 @@ void Update(RenderWindow& window) {
 	}
 
 	// update entities
-	entityManager.update(dt);
-
+	if (currScene != GameScene::mainMenu) {
+		entityManager.update(dt);
+	}
 
 	// check collision with walls
 	for (auto s = begin(tiles); s != end(tiles); ++s) {
@@ -413,9 +459,13 @@ void Update(RenderWindow& window) {
 
 void Render(RenderWindow& window) {
 	// Draw Everything
-
-	entityManager.render(window);
-	Renderer::render();
+	if (currScene == GameScene::mainMenu) {
+		window.draw(titleText);
+	}
+	else {
+		entityManager.render(window);
+		Renderer::render();
+	}
 }
 
 int main() {
