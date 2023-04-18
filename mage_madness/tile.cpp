@@ -34,7 +34,16 @@ Tile::Tile(int type, sf::Vector2f pos) : Entity() {
 
 		case 5:
 			// if end
-			setTexture(tileTex); // UPDATE TEXTURE
+			setTexture(endBlockTileTex); // UPDATE TEXTURE
+			break;
+
+		case 6:
+			// if boss level wall
+			setTexture(bossBlockTileTex);
+			break;
+		case 7:
+			// if area1 wall
+			setTexture(area1BlockTileTex);
 			break;
 		default:
 			break;

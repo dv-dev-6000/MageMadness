@@ -64,6 +64,12 @@ void LevelSystem::loadLevelFile(const std::string& path, float tileSize) {
         case 's':
             temp_tiles.push_back(SPIKE);
             break;
+        case 'q':
+            temp_tiles.push_back(BOSSBLOCK);
+            break;
+        case 'a':
+            temp_tiles.push_back(AREA1BLOCK);
+            break;
         case '\n':      // end of line
             if (w == 0) { // if we haven't written width yet
                 w = i;      // set width
@@ -133,6 +139,17 @@ void LevelSystem::buildSprites() {
                     s.type = 5;
                     _sprites.push_back(move(s));
                     break;
+
+                case BOSSBLOCK:
+                    s.type = 6;
+                    _sprites.push_back(move(s));
+                    break;
+
+                case AREA1BLOCK:
+                    s.type = 7;
+                    _sprites.push_back(move(s));
+                    break;
+
                 default:
                     break;
 

@@ -10,6 +10,9 @@ extern sf::Texture tileTex;
 extern sf::Texture breakTileTex;
 extern sf::Texture gravTileTex;
 extern sf::Texture spikeTileTex;
+extern sf::Texture bossBlockTileTex;
+extern sf::Texture area1BlockTileTex;
+extern sf::Texture endBlockTileTex;
 //extern sf::Texture endTileTex;
 
 extern sf::Texture playerTex;

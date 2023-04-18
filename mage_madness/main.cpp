@@ -18,15 +18,24 @@ void Reload();
 // list of game levels/scenes
 enum class GameScene {
 
+	// Menu
 	mainMenu,
+	// Tutorial levels
 	tutorial_1,
 	tutorial_2,
 	tutorial_3,
+	tutorial_4,
+	tutorial_5,
+	// Area 1 levels
 	level_1,
 	level_2,
 	level_3,
 	level_4,
-	level_5
+	level_5,
+	// Boss Area levels
+	boss_level_1,
+	boss_level_2,
+	boss_level_3
 };
 
 // list of game states
@@ -58,7 +67,7 @@ Font pixFont;
 Text titleText;
 
 // textures 
-sf::Texture tileTex, breakTileTex, gravTileTex, spikeTileTex;
+sf::Texture tileTex, breakTileTex, gravTileTex, spikeTileTex, bossBlockTileTex, area1BlockTileTex, endBlockTileTex;
 sf::Texture whiteBallTex;
 sf::Texture playerTex;
 
@@ -109,6 +118,15 @@ void Load() {
 		cerr << "Failed to load spritesheet!" << std::endl;
 	}
 	if (!spikeTileTex.loadFromFile("res/img/SpikesBlue.png")) {
+		cerr << "Failed to load spritesheet!" << std::endl;
+	}
+	if (!area1BlockTileTex.loadFromFile("res/img/area1Block.png")) {
+		cerr << "Failed to load spritesheet!" << std::endl;
+	}
+	if (!bossBlockTileTex.loadFromFile("res/img/bossLeveBlock.png")) {
+		cerr << "Failed to load spritesheet!" << std::endl;
+	}
+	if (!endBlockTileTex.loadFromFile("res/img/endBlock.png")) {
 		cerr << "Failed to load spritesheet!" << std::endl;
 	}
 	// load player textures
@@ -215,18 +233,62 @@ void Reload() {
 
 			break;
 
+		case GameScene::tutorial_4:
+
+			// tut 4 logic here
+
+			break;
+
+		case GameScene::tutorial_5:
+
+			// tut 5 logic here
+
+			break;
+
 		case GameScene::level_1:
 
 			// level 1 logic here
 
 			break;
 
+		case GameScene::level_2:
+
+			// level 2 logic here
+
+			break;
+		case GameScene::level_3:
+
+			// level 3 logic here
+
+			break;
+		case GameScene::level_4:
+
+			// level 4 logic here
+
+			break;
+		case GameScene::level_5:
+
+			// level 5 logic here
+
+			break;
+		case GameScene::boss_level_1:
+
+			// boss level 1 logic here
+
+			break;
+		case GameScene::boss_level_2:
+
+			// boss level 2 logic here
+
+			break;
+		case GameScene::boss_level_3:
+
+			// boss level 3 logic here
+
+			break;
 		default:
 			break;
-
 	}
-
-
 }
 
 

@@ -17,7 +17,7 @@ struct tileInfo {
 
 class LevelSystem {
 public:
-    enum TILE { EMPTY, END, WALL, SPIKE, BREAKBLOCK, GRAVBLOCK};
+    enum TILE { EMPTY, END, WALL, SPIKE, BREAKBLOCK, GRAVBLOCK, BOSSBLOCK, AREA1BLOCK};
 
     static void loadLevelFile(const std::string&, float tileSize = 64.f);
     //static void Render(sf::RenderWindow& window);
