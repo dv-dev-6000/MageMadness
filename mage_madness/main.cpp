@@ -6,6 +6,7 @@
 #include "tile.h"
 #include "player.h"
 #include "projectile.h"
+#include "enemyTurret.h"
 
 using namespace sf;
 using namespace std;
@@ -51,6 +52,7 @@ EntityManager entityManager;
 std::vector<shared_ptr<Tile>> tiles;
 std::vector<shared_ptr<Projectile>> projectiles;
 std::shared_ptr<Player> player;
+std::shared_ptr<EnemyTurret> enemyTurret;
 std::shared_ptr<TeleProjectile> tp;
 
 // var for current game scene
@@ -70,6 +72,7 @@ Text titleText;
 sf::Texture tileTex, breakTileTex, gravTileTex, spikeTileTex, bossBlockTileTex, area1BlockTileTex, endBlockTileTex;
 sf::Texture whiteBallTex;
 sf::Texture playerTex;
+sf::Texture enemyTurTex;
 
 
 // Game Methods ===========================================================================================================
@@ -138,6 +141,14 @@ void Load() {
 		cerr << "Failed to load spritesheet!" << std::endl;
 	}
 
+	// Loading enemy turret
+	if (!enemyTurTex.loadFromFile("res/img/Turret.png"))
+	{
+		cerr << "Failed to load spritesheet!" << std::endl;
+	}
+
+
+
 	pixFont.loadFromFile("res/fonts/PressStart2P-Regular.ttf");
 	titleText.setFont(pixFont);
 
@@ -156,6 +167,10 @@ void Reload() {
 	titleText.setString(" ");
 
 	// re-populate lists -------------------------------------------------
+	// Load turret enemy
+	enemyTurret = make_shared<EnemyTurret>();
+	entityManager.list.push_back(enemyTurret);
+	
 	// load player + add player to em list
 	player = std::make_shared<Player>();
 	entityManager.list.push_back(player);
@@ -199,6 +214,12 @@ void Reload() {
 				entityManager.list.push_back(tile);
 			}
 
+			// Set enemy values
+			enemyTurret->setTexture(enemyTurTex);
+			enemyTurret->setPosition({ 1250,350 });
+
+
+			
 			// set player values
 			player->setTexture(playerTex);
 			player->setPosition({ 100,100 });
@@ -514,6 +535,24 @@ void Update(RenderWindow& window) {
 			}
 		}
 	}
+
+	// Get player and turret positions
+	//Vector2f turretPos = enemyTurret->getPosition();
+	//Vector2f playerPos = player->getPosition();
+	// Calculate the distance between the player and turret
+	Vector2f difference = player->getPosition() - enemyTurret->getPosition();
+	float distance = sqrt(pow(difference.x, 2) + pow(difference.y, 2));
+	// Attack range
+	float attackRange = 250.0f;
+
+	if (distance <= attackRange)
+	{
+		//shoot
+		//cout << "Distance is: " << distance;
+		// SHOOTS ONLY AFTER PLAYER EXITED RANGE -- OR MAYBE UPDATE JUST KEEPS RESPAWNING THE BULLET TOO FAST AND IT LOOKS LIKE IT DOESNT SHOOT?
+		projectiles[0]->fireMe(enemyTurret->getPosition(), player->getPosition(), 1);
+	}
+
 }
 
 
@@ -532,6 +571,7 @@ void Render(RenderWindow& window) {
 
 int main() {
 	
+
 	// set up view
 	view.setSize({ hdGameWidth, hdGameHeight });
 	view.setCenter({ view.getSize().x / 2, view.getSize().y / 2 });

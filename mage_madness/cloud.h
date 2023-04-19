@@ -18,3 +18,6 @@ extern sf::Texture endBlockTileTex;
 extern sf::Texture playerTex;
 extern sf::Texture whiteBallTex;
 
+// Enemy turret
+extern sf::Texture enemyTurTex;
+
