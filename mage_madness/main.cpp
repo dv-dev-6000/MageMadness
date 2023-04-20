@@ -7,6 +7,7 @@
 #include "player.h"
 #include "projectile.h"
 #include "enemyTurret.h"
+#include "enemySpikey.h"
 
 using namespace sf;
 using namespace std;
@@ -53,6 +54,7 @@ std::vector<shared_ptr<Tile>> tiles;
 std::vector<shared_ptr<Projectile>> projectiles;
 std::shared_ptr<Player> player;
 std::shared_ptr<EnemyTurret> enemyTurret;
+std::shared_ptr<EnemySpikey> enemySpikey;
 std::shared_ptr<TeleProjectile> tp;
 
 // var for current game scene
@@ -73,6 +75,7 @@ sf::Texture tileTex, breakTileTex, gravTileTex, spikeTileTex, bossBlockTileTex, 
 sf::Texture whiteBallTex;
 sf::Texture playerTex;
 sf::Texture enemyTurTex;
+sf::Texture enemySpikeyTex;
 
 
 // Game Methods ===========================================================================================================
@@ -140,12 +143,15 @@ void Load() {
 		cerr << "Failed to load spritesheet!" << std::endl;
 	}
 
-	// Loading enemy turret
+	// Loading enemies
 	if (!enemyTurTex.loadFromFile("res/img/Turret.png"))
 	{
 		cerr << "Failed to load spritesheet!" << std::endl;
 	}
-
+	if (!enemySpikeyTex.loadFromFile("res/img/SpikeyFollow.png"))
+	{
+		cerr << "Failed to load spritesheet!" << std::endl;
+	}
 
 
 	pixFont.loadFromFile("res/fonts/PressStart2P-Regular.ttf");
@@ -169,7 +175,10 @@ void Reload() {
 	// Load turret enemy
 	enemyTurret = make_shared<EnemyTurret>();
 	entityManager.list.push_back(enemyTurret);
-	
+	// Load enemy spikey
+	enemySpikey = make_shared<EnemySpikey>();
+	entityManager.list.push_back(enemySpikey);
+
 	// load player + add player to em list
 	player = std::make_shared<Player>();
 	entityManager.list.push_back(player);
@@ -216,6 +225,9 @@ void Reload() {
 			// Set enemy values
 			enemyTurret->setTexture(enemyTurTex);
 			enemyTurret->setPosition({ 1250,350 });
+
+			enemySpikey->setTexture(enemySpikeyTex);
+			enemySpikey->setPosition({ 500,350 });
 
 
 			
