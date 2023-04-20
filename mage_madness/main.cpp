@@ -77,6 +77,10 @@ sf::Texture playerTex;
 sf::Texture enemyTurTex;
 sf::Texture enemySpikeyTex;
 
+// Player/enemies position values
+Vector2f playerPosition(100, 100);
+Vector2f enemTurPosition(1250, 350);
+Vector2f enemSpikPosition(250,350);
 
 // Game Methods ===========================================================================================================
 
@@ -153,7 +157,6 @@ void Load() {
 		cerr << "Failed to load spritesheet!" << std::endl;
 	}
 
-
 	pixFont.loadFromFile("res/fonts/PressStart2P-Regular.ttf");
 	titleText.setFont(pixFont);
 
@@ -170,11 +173,6 @@ void Reload() {
 	projectiles.clear();
 	entityManager.list.clear();
 	titleText.setString(" ");
-
-	// Player/enemies position values
-	Vector2f playerPosition(100, 100);
-	Vector2f enemTurPosition(1250, 350);
-	Vector2f enemSpikPosition(playerPosition);
 
 	// re-populate lists -------------------------------------------------
 	// Load turret enemy
@@ -233,7 +231,7 @@ void Reload() {
 			// Set enemy turret values
 			enemyTurret->setTexture(enemyTurTex);
 			enemyTurret->setPosition({enemTurPosition});
-			// Set enemy spikey values -- object position is player position
+			// Set enemy spikey values
 			enemySpikey->setTexture(enemySpikeyTex);
 			enemySpikey->setPosition({enemSpikPosition});
 
@@ -563,12 +561,23 @@ void Update(RenderWindow& window) {
 		if (timeSinceLastShot >= 1.0f / fireRate && distance <= attackRange) // DOESNT WORK, REMOVE TURRET FIRE CLOCK CODE
 		{
 			timeSinceLastShot = 0.0f;
-			//shoot
+			// SHoot
 			//cout << "Distance is: " << distance;
 			// SHOOTS ONLY AFTER PLAYER EXITED RANGE -- OR MAYBE UPDATE JUST KEEPS RESPAWNING THE BULLET TOO FAST AND IT LOOKS LIKE IT DOESNT SHOOT?
 			projectiles[0]->fireMe(enemyTurret->getPosition(), player->getPosition(), 1);
 		}
 	
+	// Spikey enemy follow code
+		// Calculate direction from enemy to player
+		sf::Vector2f direction = player->getPosition() - enemySpikey->getPosition();
+		float length = sqrt(direction.x * direction.x + direction.y * direction.y);
+		if (length != 0.0f)
+		{
+			direction /= length;
+		}
+		float speed = 400;
+		// Move enemy spikey
+		enemySpikey->move(direction* speed* clock.getElapsedTime().asSeconds());
 }
 
 

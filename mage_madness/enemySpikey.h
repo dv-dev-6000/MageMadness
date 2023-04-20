@@ -4,6 +4,9 @@
 
 class EnemySpikey : public Entity
 {
+protected:
+    float _speed;
+
 public:
 
     //Constructor

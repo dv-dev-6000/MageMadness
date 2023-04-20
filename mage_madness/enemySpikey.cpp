@@ -8,6 +8,8 @@ EnemySpikey::EnemySpikey() : Entity()
 {
 	setTextureRect(IntRect(Vector2(0, 0), Vector2(46, 47)));
 	setTexture(enemySpikeyTex);
+
+	_speed = 100;
 }
 
 void EnemySpikey::Update(const float& dt)
