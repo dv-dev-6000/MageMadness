@@ -171,6 +171,11 @@ void Reload() {
 	entityManager.list.clear();
 	titleText.setString(" ");
 
+	// Player/enemies position values
+	Vector2f playerPosition(100, 100);
+	Vector2f enemTurPosition(1250, 350);
+	Vector2f enemSpikPosition(playerPosition);
+
 	// re-populate lists -------------------------------------------------
 	// Load turret enemy
 	enemyTurret = make_shared<EnemyTurret>();
@@ -222,18 +227,15 @@ void Reload() {
 				entityManager.list.push_back(tile);
 			}
 
-			// Set enemy values
-			enemyTurret->setTexture(enemyTurTex);
-			enemyTurret->setPosition({ 1250,350 });
-
-			enemySpikey->setTexture(enemySpikeyTex);
-			enemySpikey->setPosition({ 500,350 });
-
-
-			
 			// set player values
 			player->setTexture(playerTex);
-			player->setPosition({ 100,100 });
+			player->setPosition({ playerPosition });
+			// Set enemy turret values
+			enemyTurret->setTexture(enemyTurTex);
+			enemyTurret->setPosition({enemTurPosition});
+			// Set enemy spikey values -- object position is player position
+			enemySpikey->setTexture(enemySpikeyTex);
+			enemySpikey->setPosition({enemSpikPosition});
 
 			break;
 
