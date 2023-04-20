@@ -109,7 +109,6 @@ void Init() {
 /// Initial load - called on start up
 /// </summary>
 void Load() {
-
 	// load tile textures
 	if (!tileTex.loadFromFile("res/img/SpecialBlock3.png")) {
 		cerr << "Failed to load spritesheet!" << std::endl;
@@ -324,7 +323,7 @@ void Update(RenderWindow& window) {
 	// check and consume events
 	Event event;
 	while (window.pollEvent(event)) {
-		
+
 		// key pressed events
 		if (event.type == sf::Event::KeyPressed)
 		{
@@ -332,7 +331,7 @@ void Update(RenderWindow& window) {
 			if (currState == GameState::playing) {
 
 				// prep Jump
-				if (event.key.code == Keyboard::Space) { 
+				if (event.key.code == Keyboard::Space) {
 
 					player->jumpPressed();
 				}
@@ -343,7 +342,7 @@ void Update(RenderWindow& window) {
 				}
 				if (event.key.code == Keyboard::A) {
 
-					player->setTextureRect(sf::IntRect(Vector2(45, 0), Vector2(-45,64)));
+					player->setTextureRect(sf::IntRect(Vector2(45, 0), Vector2(-45, 64)));
 				}
 			}
 
@@ -377,13 +376,13 @@ void Update(RenderWindow& window) {
 					Reload();
 				}
 			}
-			
+
 
 			if (event.key.code == Keyboard::F1) {
 
 				// minimaize and change aspect ratio -- move to options menu
 				window.create(VideoMode({ 800,600 }, desktop.bitsPerPixel), "MageMadness", sf::Style::Default);
-				view.setSize({ hdGameWidth, hdGameHeight + (hdGameHeight/3)});
+				view.setSize({ hdGameWidth, hdGameHeight + (hdGameHeight / 3) });
 				ResetWindow(window);
 			}
 			if (event.key.code == Keyboard::F2) {
@@ -439,7 +438,7 @@ void Update(RenderWindow& window) {
 			optional collision = wBounds.findIntersection(projBounds);
 
 			if ((*it)->getState() && collision) {
-				
+
 				// if breakblock then move offscreen
 				if ((*s)->getType() == 3) {
 					(*s)->setPosition({ -128, -128 });
@@ -470,7 +469,7 @@ void Update(RenderWindow& window) {
 			}
 			(*s)->setColliding(isColliding);
 		}
-		
+
 
 		// check tp projectile collision
 		// get projectile bounds
@@ -536,23 +535,26 @@ void Update(RenderWindow& window) {
 		}
 	}
 
-	// Get player and turret positions
-	//Vector2f turretPos = enemyTurret->getPosition();
-	//Vector2f playerPos = player->getPosition();
 	// Calculate the distance between the player and turret
 	Vector2f difference = player->getPosition() - enemyTurret->getPosition();
 	float distance = sqrt(pow(difference.x, 2) + pow(difference.y, 2));
 	// Attack range
 	float attackRange = 250.0f;
+	// Turret fire clock
+	float fireRate = 1.0f; // Shots per second
+	float timeSinceLastShot = 0.0f;
+	timeSinceLastShot += dt;
 
-	if (distance <= attackRange)
-	{
-		//shoot
-		//cout << "Distance is: " << distance;
-		// SHOOTS ONLY AFTER PLAYER EXITED RANGE -- OR MAYBE UPDATE JUST KEEPS RESPAWNING THE BULLET TOO FAST AND IT LOOKS LIKE IT DOESNT SHOOT?
-		projectiles[0]->fireMe(enemyTurret->getPosition(), player->getPosition(), 1);
-	}
 
+		if (timeSinceLastShot >= 1.0f / fireRate && distance <= attackRange) // DOESNT WORK, REMOVE TURRET FIRE CLOCK CODE
+		{
+			timeSinceLastShot = 0.0f;
+			//shoot
+			//cout << "Distance is: " << distance;
+			// SHOOTS ONLY AFTER PLAYER EXITED RANGE -- OR MAYBE UPDATE JUST KEEPS RESPAWNING THE BULLET TOO FAST AND IT LOOKS LIKE IT DOESNT SHOOT?
+			projectiles[0]->fireMe(enemyTurret->getPosition(), player->getPosition(), 1);
+		}
+	
 }
 
 
