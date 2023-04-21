@@ -51,7 +51,7 @@ EntityManager entityManager;
 std::vector<shared_ptr<Tile>> tiles;
 std::vector<shared_ptr<Projectile>> projectiles;
 std::shared_ptr<Player> player;
-std::shared_ptr<EnemyTurret> enemyTurret;
+std::shared_ptr<EnemyTurret> enemyTurret;		// ** to do - if adding more turrets then they will need to be stored in a vector like projectiles
 std::shared_ptr<EnemySpikey> enemySpikey;
 std::shared_ptr<TeleProjectile> tp;
 
