@@ -82,6 +82,10 @@ Vector2f playerPosition(100, 100);
 Vector2f enemTurPosition(1250, 350);
 Vector2f enemSpikPosition(250,350);
 
+// For turret fire time
+Time elapsedTime;
+Clock r;
+
 // Game Methods ===========================================================================================================
 
 // manage window options
@@ -547,37 +551,50 @@ void Update(RenderWindow& window) {
 		}
 	}
 
+	// AUTO TURRET CODE
 	// Calculate the distance between the player and turret
 	Vector2f difference = player->getPosition() - enemyTurret->getPosition();
 	float distance = sqrt(pow(difference.x, 2) + pow(difference.y, 2));
+
 	// Attack range
-	float attackRange = 250.0f;
-	// Turret fire clock
-	float fireRate = 1.0f; // Shots per second
-	float timeSinceLastShot = 0.0f;
-	timeSinceLastShot += dt;
+	float attackRange = 500.0f;
 
+	Time deltaTime = milliseconds(1200);
+	elapsedTime += r.restart();
 
-		if (timeSinceLastShot >= 1.0f / fireRate && distance <= attackRange) // DOESNT WORK, REMOVE TURRET FIRE CLOCK CODE
+	// While elapsed time is higher than dt
+	while (elapsedTime >= deltaTime)
+	{
+		// And player is in turrets firing range
+		if (distance <= attackRange)
 		{
-			timeSinceLastShot = 0.0f;
-			// SHoot
-			//cout << "Distance is: " << distance;
-			// SHOOTS ONLY AFTER PLAYER EXITED RANGE -- OR MAYBE UPDATE JUST KEEPS RESPAWNING THE BULLET TOO FAST AND IT LOOKS LIKE IT DOESNT SHOOT?
-			projectiles[0]->fireMe(enemyTurret->getPosition(), player->getPosition(), 1);
+			// Shoot bullets
+			for (int i = 0; i < 1; i++) {
+
+				std::shared_ptr<Projectile> p = std::make_shared<Projectile>();
+				projectiles.push_back(p);
+				entityManager.list.push_back(p);
+				
+				p->fireMe(enemyTurret->getPosition(), player->getPosition(), 1);
+			}
 		}
-	
-	// Spikey enemy follow code
-		// Calculate direction from enemy to player
-		sf::Vector2f direction = player->getPosition() - enemySpikey->getPosition();
-		float length = sqrt(direction.x * direction.x + direction.y * direction.y);
-		if (length != 0.0f)
-		{
-			direction /= length;
-		}
-		float speed = 400;
-		// Move enemy spikey
-		enemySpikey->move(direction* speed* clock.getElapsedTime().asSeconds());
+		// Subtract elapsed time
+		elapsedTime -= deltaTime;
+	}
+
+	// SPIKEY - FOLLOWING ENEMY CODE
+	// Calculate direction from enemy to player
+	sf::Vector2f direction = player->getPosition() - enemySpikey->getPosition();
+	float length = sqrt(direction.x * direction.x + direction.y * direction.y);
+
+	// If length not 0 then divide direction/length and move enemy towards player
+	if (length != 0.0f)
+	{
+		direction /= length;
+	}
+	float speed = 400;
+	// Move enemy spikey
+	enemySpikey->move(direction* speed* clock.getElapsedTime().asSeconds());
 }
 
 
