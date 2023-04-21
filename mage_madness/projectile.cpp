@@ -56,7 +56,7 @@ bool Projectile::getState() {
 
 void  Projectile::resetProjectile() {
 	_isActive = false;
-	_dest = { 0,0 };
+	_dest = { -10,-10 };
 	_angleShot = 0;
 	_angleShot2 = 0;
 	_speed = 500;

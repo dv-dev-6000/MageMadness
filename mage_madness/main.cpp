@@ -574,11 +574,11 @@ void Update(RenderWindow& window) {
 			// Shoot bullets
 			for (int i = 0; i < 1; i++) {
 
-				std::shared_ptr<Projectile> p = std::make_shared<Projectile>();
-				projectiles.push_back(p);
-				entityManager.list.push_back(p);
+				//std::shared_ptr<Projectile> p = std::make_shared<Projectile>();
+				//projectiles.push_back(p);
+				//entityManager.list.push_back(p);
 				
-				p->fireMe(enemyTurret->getPosition(), player->getPosition(), 1, 300);
+				projectiles[1]->fireMe(enemyTurret->getPosition(), player->getPosition(), 1, 300);
 			}
 		}
 		// Subtract elapsed time
