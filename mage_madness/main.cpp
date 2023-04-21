@@ -26,8 +26,6 @@ enum class GameScene {
 	tutorial_1,
 	tutorial_2,
 	tutorial_3,
-	tutorial_4,
-	tutorial_5,
 	// Area 1 levels
 	level_1,
 	level_2,
@@ -47,7 +45,7 @@ enum class GameState {
 	menu,
 };
 
-// entities & lists  ** integrate to entity management system
+// entities & lists  
 EntityManager entityManager;
 
 std::vector<shared_ptr<Tile>> tiles;
@@ -195,9 +193,9 @@ void Reload() {
 	entityManager.list.push_back(tp);
 
 	// Load turret enemy
-	enemyTurret = make_shared<EnemyTurret>();
+	enemyTurret = make_shared<EnemyTurret>(player);
 	// Load enemy spikey
-	enemySpikey = make_shared<EnemySpikey>();
+	enemySpikey = make_shared<EnemySpikey>(player);
 
 	// level logic -------------------------------------------------------
 	switch (currScene) {
@@ -265,18 +263,6 @@ void Reload() {
 		case GameScene::tutorial_3:
 
 			// tut 3 logic here
-
-			break;
-
-		case GameScene::tutorial_4:
-
-			// tut 4 logic here
-
-			break;
-
-		case GameScene::tutorial_5:
-
-			// tut 5 logic here
 
 			break;
 
@@ -420,7 +406,7 @@ void Update(RenderWindow& window) {
 				// map mouse coords to world coords
 				sf::Vector2f mousePosition = window.mapPixelToCoords(sf::Mouse::getPosition(window));
 
-				projectiles[0]->fireMe(player->getPosition(), mousePosition, 1, 500);
+				projectiles[0]->fireMe(player->getPosition(), mousePosition, 2, 500);
 			}
 			if (event.mouseButton.button == sf::Mouse::Right) {
 
@@ -554,50 +540,17 @@ void Update(RenderWindow& window) {
 		}
 	}
 
-	// AUTO TURRET CODE
-	// Calculate the distance between the player and turret
-	Vector2f difference = player->getPosition() - enemyTurret->getPosition();
-	float distance = sqrt(pow(difference.x, 2) + pow(difference.y, 2));
+	// check if turrets can shoot		*** once multiple turrets supported this shoudld cycle through a list of all turrets
+	if (enemyTurret->Shoot()) {
 
-	// Attack range
-	float attackRange = 500.0f;
+		std::shared_ptr<Projectile> p = std::make_shared<Projectile>();
+		projectiles.push_back(p);
+		entityManager.list.push_back(p);
+		
+		p->fireMe(enemyTurret->getPosition(), player->getPosition(), 1, 300);
 
-	Time deltaTime = milliseconds(2000);
-	elapsedTime += r.restart();
-
-	// While elapsed time is higher than dt
-	while (elapsedTime >= deltaTime)
-	{
-		// And player is in turrets firing range
-		if (distance <= attackRange)
-		{
-			// Shoot bullets
-			for (int i = 0; i < 1; i++) {
-
-				//std::shared_ptr<Projectile> p = std::make_shared<Projectile>();
-				//projectiles.push_back(p);
-				//entityManager.list.push_back(p);
-				
-				projectiles[1]->fireMe(enemyTurret->getPosition(), player->getPosition(), 1, 300);
-			}
-		}
-		// Subtract elapsed time
-		elapsedTime -= deltaTime;
 	}
 
-	// SPIKEY - FOLLOWING ENEMY CODE
-	// Calculate direction from enemy to player
-	sf::Vector2f direction = player->getPosition() - enemySpikey->getPosition();
-	float length = sqrt(direction.x * direction.x + direction.y * direction.y);
-
-	// If length not 0 then divide direction/length and move enemy towards player
-	if (length != 0.0f)
-	{
-		direction /= length;
-	}
-	float speed = 50;
-	// Move enemy spikey
-	enemySpikey->move(direction* speed* dt);
 }
 
 
