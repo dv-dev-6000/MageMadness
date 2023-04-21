@@ -179,12 +179,6 @@ void Reload() {
 	titleText.setString(" ");
 
 	// re-populate lists -------------------------------------------------
-	// Load turret enemy
-	enemyTurret = make_shared<EnemyTurret>();
-	entityManager.list.push_back(enemyTurret);
-	// Load enemy spikey
-	enemySpikey = make_shared<EnemySpikey>();
-	entityManager.list.push_back(enemySpikey);
 
 	// load player + add player to em list
 	player = std::make_shared<Player>();
@@ -199,6 +193,11 @@ void Reload() {
 	// load single tele projectile + add tp to em list
 	tp = std::make_shared<TeleProjectile>();
 	entityManager.list.push_back(tp);
+
+	// Load turret enemy
+	enemyTurret = make_shared<EnemyTurret>();
+	// Load enemy spikey
+	enemySpikey = make_shared<EnemySpikey>();
 
 	// level logic -------------------------------------------------------
 	switch (currScene) {
@@ -325,6 +324,10 @@ void Reload() {
 		default:
 			break;
 	}
+
+	// add enemies
+	entityManager.list.push_back(enemyTurret);
+	entityManager.list.push_back(enemySpikey);
 }
 
 
@@ -559,7 +562,7 @@ void Update(RenderWindow& window) {
 	// Attack range
 	float attackRange = 500.0f;
 
-	Time deltaTime = milliseconds(1200);
+	Time deltaTime = milliseconds(2000);
 	elapsedTime += r.restart();
 
 	// While elapsed time is higher than dt
@@ -592,9 +595,9 @@ void Update(RenderWindow& window) {
 	{
 		direction /= length;
 	}
-	float speed = 400;
+	float speed = 50;
 	// Move enemy spikey
-	enemySpikey->move(direction* speed* clock.getElapsedTime().asSeconds());
+	enemySpikey->move(direction* speed* dt);
 }
 
 
