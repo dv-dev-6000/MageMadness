@@ -3,6 +3,12 @@
 #include "player.h"
 #include <SFML/Graphics.hpp>
 
+enum class SpikeyState {
+    Travelling,
+    Patrolling,
+    Following
+};
+
 class EnemySpikey : public Entity
 {
 protected:
@@ -10,6 +16,7 @@ protected:
     float _speed;
     float _length;
     sf::Vector2f _direction;
+    SpikeyState _currState;
 
 public:
 
