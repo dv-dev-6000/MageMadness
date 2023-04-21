@@ -417,14 +417,14 @@ void Update(RenderWindow& window) {
 				// map mouse coords to world coords
 				sf::Vector2f mousePosition = window.mapPixelToCoords(sf::Mouse::getPosition(window));
 
-				projectiles[0]->fireMe(player->getPosition(), mousePosition, 1);
+				projectiles[0]->fireMe(player->getPosition(), mousePosition, 1, 500);
 			}
 			if (event.mouseButton.button == sf::Mouse::Right) {
 
 				// map mouse coords to world coords
 				sf::Vector2f mousePosition = window.mapPixelToCoords(sf::Mouse::getPosition(window));
 
-				tp->fireMe(player->getPosition(), mousePosition, 1);
+				tp->fireMe(player->getPosition(), mousePosition, 1, 500);
 			}
 		}
 
@@ -575,7 +575,7 @@ void Update(RenderWindow& window) {
 				projectiles.push_back(p);
 				entityManager.list.push_back(p);
 				
-				p->fireMe(enemyTurret->getPosition(), player->getPosition(), 1);
+				p->fireMe(enemyTurret->getPosition(), player->getPosition(), 1, 300);
 			}
 		}
 		// Subtract elapsed time

@@ -37,13 +37,14 @@ void Projectile::Update(const float& dt) {
 }
 
 
-void Projectile::fireMe(sf::Vector2f startPos, sf::Vector2f destination, int hp) {
+void Projectile::fireMe(sf::Vector2f startPos, sf::Vector2f destination, int hp, float speed) {
 
 	_isActive = true;
 	_hp = 2;
 	setColor(Color::Cyan);
 	setPosition(startPos);
 	_dest = destination;
+	_speed = speed;
 
 	_angleShot = atan2(destination.y - getPosition().y, destination.x - getPosition().x);
 	_angleShot2 = -_angleShot;
