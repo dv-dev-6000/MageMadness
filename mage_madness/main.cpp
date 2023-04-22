@@ -646,6 +646,64 @@ void Update(RenderWindow& window) {
 	Event event;
 	while (window.pollEvent(event)) {
 
+		// controller (xbox 360)
+		// joy R = xbox Y
+		// joy X = xbox A
+		// joy Y = xbox B
+		// joy Z = xbox X
+		// joy V = rSh		povX = Select
+		// joy U = lSh		povY = Start
+		if (event.type == sf::Event::JoystickMoved) {
+			if (event.joystickMove.axis == Joystick::Axis::X) {
+				
+				if (event.joystickMove.position > 30) {
+					// move right
+					player->setMoving(false, true);
+				}
+				else if (event.joystickMove.position < -30) {
+					// move left
+					player->setMoving(true, false);
+				}
+				else {
+					// stop
+					player->setMoving(false, false);
+				}
+				
+			}
+			if (event.joystickMove.axis == Joystick::Axis::U) {
+
+				if (event.joystickMove.position > 0) {
+					// cursor right
+				}
+				else if (event.joystickMove.position < 0) {
+					// cursor left
+				}
+
+			}
+			if (event.joystickMove.axis == Joystick::Axis::V) {
+
+				if (event.joystickMove.position > 30) {
+					// cursor up
+				}
+				else if (event.joystickMove.position < -30) {
+					// cursor down
+				}
+
+			}
+		}
+		if (event.type == sf::Event::JoystickButtonPressed) {
+			if (event.joystickButton.button == Joystick::X) {
+				player->jumpPressed();
+			}
+
+		}
+		if (event.type == sf::Event::JoystickButtonReleased) {
+			if (event.joystickButton.button == Joystick::X) {
+				player->jumpReleased();
+			}
+
+		}
+
 		// key pressed events
 		if (event.type == sf::Event::KeyPressed)
 		{

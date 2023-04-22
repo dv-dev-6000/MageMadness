@@ -16,6 +16,11 @@ protected:
 
     bool _isAirborn;
     bool _jumpPressed;
+    bool _movingLeft;
+    bool _movingRight;
+
+    void moveLeft();
+    void moveRight();
 
 public:
 
@@ -30,6 +35,7 @@ public:
     void resetVelocity(float x, float y);
     void jumpPressed();
     void jumpReleased();
+    void setMoving(bool left, bool right);
 
     void projectilePressed();
     void projectileReleased();
