@@ -8,6 +8,7 @@
 #include "projectile.h"
 #include "enemyTurret.h"
 #include "enemySpikey.h"
+#include "button.h"
 
 using namespace sf;
 using namespace std;
@@ -72,6 +73,7 @@ Text titleText;
 sf::Texture tileTex, breakTileTex, gravTileTex, spikeTileTex, bossBlockTileTex, area1BlockTileTex, endBlockTileTex;
 sf::Texture whiteBallTex;
 sf::Texture playerTex;
+sf::Texture buttonTex;
 sf::Texture enemyTurTex;
 sf::Texture enemySpikeyTex;
 
@@ -148,6 +150,10 @@ void Load() {
 	if (!whiteBallTex.loadFromFile("res/img/WhiteBall.png")) {
 		cerr << "Failed to load spritesheet!" << std::endl;
 	}
+	// load projectile textures
+	if (!buttonTex.loadFromFile("res/img/Button.png")) {
+		cerr << "Failed to load spritesheet!" << std::endl;
+	}
 
 	// Loading enemies
 	if (!enemyTurTex.loadFromFile("res/img/Turret.png"))
@@ -207,7 +213,7 @@ void Reload() {
 			titleText.setCharacterSize(64);
 			titleText.setString("Mage Madness");
 			titleText.setPosition({ (view.getSize().x * .5f) - (titleText.getLocalBounds().width * .5f), (view.getSize().y * .5f) - (titleText.getLocalBounds().height * .5f) });
-
+			
 			break;
 
 		case GameScene::tutorial_1:
@@ -426,6 +432,9 @@ void Update(RenderWindow& window) {
 	// update entities
 	if (currScene != GameScene::mainMenu) {
 		entityManager.update(dt);
+	}
+	else {
+
 	}
 
 	// check collision with walls

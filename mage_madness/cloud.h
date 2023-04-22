@@ -17,6 +17,9 @@ extern sf::Texture endBlockTileTex;
 
 extern sf::Texture playerTex;
 extern sf::Texture whiteBallTex;
+extern sf::Texture buttonTex;
+
+extern sf::Font pixFont;
 
 // Enemies
 extern sf::Texture enemyTurTex;
