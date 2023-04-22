@@ -69,20 +69,16 @@ Font pixFont;
 Text titleText;
 
 // textures 
-sf::Texture tileTex, breakTileTex, gravTileTex, spikeTileTex, bossBlockTileTex, area1BlockTileTex, endBlockTileTex;
+sf::Texture tileTex, breakTileTex, gravTileTex, spikeTileTex, bossBlockTileTex, area1BlockTileTex, endBlockTileTex, upDownSpikesTex;
 sf::Texture whiteBallTex;
 sf::Texture playerTex;
 sf::Texture enemyTurTex;
 sf::Texture enemySpikeyTex;
 
-// Player/enemies position values
-Vector2f playerPosition(100, 100);
-Vector2f enemTurPosition(1250, 350);
-Vector2f enemSpikPosition(250,350);
-
 // For turret fire time
 Time elapsedTime;
 Clock r;
+Vector2f initialPlayerPosition;
 
 // Game Methods ===========================================================================================================
 
@@ -138,6 +134,9 @@ void Load() {
 		cerr << "Failed to load spritesheet!" << std::endl;
 	}
 	if (!endBlockTileTex.loadFromFile("res/img/endBlock.png")) {
+		cerr << "Failed to load spritesheet!" << std::endl;
+	}
+	if (!upDownSpikesTex.loadFromFile("res/img/SpikesUpDown.png")) {
 		cerr << "Failed to load spritesheet!" << std::endl;
 	}
 	// load player textures
@@ -228,35 +227,19 @@ void Reload() {
 
 			// set player values
 			player->setTexture(playerTex);
-			player->setPosition({ playerPosition });
+			player->setPosition({ 100, 100 });
 			// Set enemy turret values
 			enemyTurret->setTexture(enemyTurTex);
-			enemyTurret->setPosition({enemTurPosition});
+			enemyTurret->setPosition({ 1250, 350 });
 			// Set enemy spikey values
 			enemySpikey->setTexture(enemySpikeyTex);
-			enemySpikey->setPosition({enemSpikPosition});
+			enemySpikey->setPosition({ 250,350 });
 
 			break;
 
 		case GameScene::tutorial_2:
 
 			// tut 2 logic here
-
-			// level load
-			ls::loadLevelFile("res/levels/tutTwo.txt");
-			// add tiles to tile list
-			for (int i = 0; i < ls::_sprites.size(); i++) {
-
-				tileInfo currTile = ls::_sprites[i];
-
-				std::shared_ptr<Tile> tile = std::make_shared<Tile>(currTile.type, currTile.pos);
-				tiles.push_back(tile);
-				entityManager.list.push_back(tile);
-			}
-
-			// set player values
-			player->setTexture(playerTex);
-			player->setPosition({ 100,100 });
 
 			break;
 
@@ -269,44 +252,219 @@ void Reload() {
 		case GameScene::level_1:
 
 			// level 1 logic here
+			initialPlayerPosition = { 100, 100 };
+			// level load
+			ls::loadLevelFile("res/levels/level1.txt");
+			// add tiles to tile list
+			for (int i = 0; i < ls::_sprites.size(); i++) {
+
+				tileInfo currTile = ls::_sprites[i];
+
+				std::shared_ptr<Tile> tile = std::make_shared<Tile>(currTile.type, currTile.pos);
+				tiles.push_back(tile);
+				entityManager.list.push_back(tile);
+			}
+
+			// set player values
+			player->setTexture(playerTex);
+			player->setPosition({ initialPlayerPosition});
+			// Set enemy turret values
+			enemyTurret->setTexture(enemyTurTex);
+			enemyTurret->setPosition({ 1000, 700 });
+			// Set enemy spikey values
+			enemySpikey->setTexture(enemySpikeyTex);
+			enemySpikey->setPosition({ 600,150 });
 
 			break;
 
 		case GameScene::level_2:
 
 			// level 2 logic here
+			initialPlayerPosition = { 1050,140 };
+			// level load
+			ls::loadLevelFile("res/levels/level2.txt");
+			// add tiles to tile list
+			for (int i = 0; i < ls::_sprites.size(); i++) {
+
+				tileInfo currTile = ls::_sprites[i];
+
+				std::shared_ptr<Tile> tile = std::make_shared<Tile>(currTile.type, currTile.pos);
+				tiles.push_back(tile);
+				entityManager.list.push_back(tile);
+			}
+
+			// set player values
+			player->setTexture(playerTex);
+			player->setPosition({ initialPlayerPosition });
+			// Set enemy turret values
+			enemyTurret->setTexture(enemyTurTex);
+			enemyTurret->setPosition({ 1000,500 });
+			// Set enemy spikey values
+			enemySpikey->setTexture(enemySpikeyTex);
+			enemySpikey->setPosition({ 150, 600 });
 
 			break;
 		case GameScene::level_3:
 
 			// level 3 logic here
+			initialPlayerPosition = { 100, 450 };
+			// level load
+			ls::loadLevelFile("res/levels/level3.txt");
+			// add tiles to tile list
+			for (int i = 0; i < ls::_sprites.size(); i++) {
+
+				tileInfo currTile = ls::_sprites[i];
+
+				std::shared_ptr<Tile> tile = std::make_shared<Tile>(currTile.type, currTile.pos);
+				tiles.push_back(tile);
+				entityManager.list.push_back(tile);
+			}
+
+			// set player values
+			player->setTexture(playerTex);
+			player->setPosition({ initialPlayerPosition });
+			// Set enemy turret values
+			enemyTurret->setTexture(enemyTurTex);
+			enemyTurret->setPosition({ 850,650 });
+			// Set enemy spikey values
+			enemySpikey->setTexture(enemySpikeyTex);
+			enemySpikey->setPosition({ 150, 600 });
 
 			break;
 		case GameScene::level_4:
 
 			// level 4 logic here
+			initialPlayerPosition = { 850, 450 };
+			// level load
+			ls::loadLevelFile("res/levels/level4.txt");
+			// add tiles to tile list
+			for (int i = 0; i < ls::_sprites.size(); i++) {
+
+				tileInfo currTile = ls::_sprites[i];
+
+				std::shared_ptr<Tile> tile = std::make_shared<Tile>(currTile.type, currTile.pos);
+				tiles.push_back(tile);
+				entityManager.list.push_back(tile);
+			}
+
+			// set player values
+			player->setTexture(playerTex);
+			player->setPosition({ initialPlayerPosition });
+			// Set enemy turret values
+			enemyTurret->setTexture(enemyTurTex);
+			enemyTurret->setPosition({ 250,250 });
+			// Set enemy spikey values
+			enemySpikey->setTexture(enemySpikeyTex);
+			enemySpikey->setPosition({ 150, 600 });
 
 			break;
 		case GameScene::level_5:
 
 			// level 5 logic here
+			initialPlayerPosition = { 100, 100 };
+			// level load
+			ls::loadLevelFile("res/levels/level5.txt");
+			// add tiles to tile list
+			for (int i = 0; i < ls::_sprites.size(); i++) {
+
+				tileInfo currTile = ls::_sprites[i];
+
+				std::shared_ptr<Tile> tile = std::make_shared<Tile>(currTile.type, currTile.pos);
+				tiles.push_back(tile);
+				entityManager.list.push_back(tile);
+			}
+
+			// set player values
+			player->setTexture(playerTex);
+			player->setPosition({ initialPlayerPosition });
+			// Set enemy turret values
+			enemyTurret->setTexture(enemyTurTex);
+			enemyTurret->setPosition({ 1000,550 });
+			// Set enemy spikey values
+			enemySpikey->setTexture(enemySpikeyTex);
+			enemySpikey->setPosition({ 150, 600 });
 
 			break;
 		case GameScene::boss_level_1:
 
 			// boss level 1 logic here
+			initialPlayerPosition = { 100, 250 };
+			// level load
+			ls::loadLevelFile("res/levels/bossLevel1.txt");
+			// add tiles to tile list
+			for (int i = 0; i < ls::_sprites.size(); i++) {
 
+				tileInfo currTile = ls::_sprites[i];
+
+				std::shared_ptr<Tile> tile = std::make_shared<Tile>(currTile.type, currTile.pos);
+				tiles.push_back(tile);
+				entityManager.list.push_back(tile);
+			}
+
+			// set player values
+			player->setTexture(playerTex);
+			player->setPosition({ initialPlayerPosition });
+			// Set enemy turret values
+			enemyTurret->setTexture(enemyTurTex);
+			enemyTurret->setPosition({ 1100,450 });
+			// Set enemy spikey values
+			enemySpikey->setTexture(enemySpikeyTex);
+			enemySpikey->setPosition({ 150, 600 });
 			break;
 		case GameScene::boss_level_2:
 
 			// boss level 2 logic here
+			initialPlayerPosition = { 700, 150 };
+			// level load
+			ls::loadLevelFile("res/levels/bossLevel2.txt");
+			// add tiles to tile list
+			for (int i = 0; i < ls::_sprites.size(); i++) {
 
+				tileInfo currTile = ls::_sprites[i];
+
+				std::shared_ptr<Tile> tile = std::make_shared<Tile>(currTile.type, currTile.pos);
+				tiles.push_back(tile);
+				entityManager.list.push_back(tile);
+			}
+
+			// set player values
+			player->setTexture(playerTex);
+			player->setPosition({ initialPlayerPosition });
+			// Set enemy turret values
+			enemyTurret->setTexture(enemyTurTex);
+			enemyTurret->setPosition({ 400,500 });
+			// Set enemy spikey values
+			enemySpikey->setTexture(enemySpikeyTex);
+			enemySpikey->setPosition({ 150, 600 });
 			break;
+
 		case GameScene::boss_level_3:
 
 			// boss level 3 logic here
+			initialPlayerPosition = { 1750, 800 };
+			// level load
+			ls::loadLevelFile("res/levels/bossLevel3.txt");
+			// add tiles to tile list
+			for (int i = 0; i < ls::_sprites.size(); i++) {
 
+				tileInfo currTile = ls::_sprites[i];
+
+				std::shared_ptr<Tile> tile = std::make_shared<Tile>(currTile.type, currTile.pos);
+				tiles.push_back(tile);
+				entityManager.list.push_back(tile);
+			}
+
+			// set player values
+			player->setTexture(playerTex);
+			player->setPosition({ initialPlayerPosition });
+			// Set enemy turret values
+			enemyTurret->setTexture(enemyTurTex);
+			enemyTurret->setPosition({ 300,650 });
+			// Set enemy spikey values
+			enemySpikey->setTexture(enemySpikeyTex);
+			enemySpikey->setPosition({ 150, 600 });
 			break;
+
 		default:
 			break;
 	}
@@ -375,8 +533,35 @@ void Update(RenderWindow& window) {
 					if (currScene == GameScene::mainMenu) {
 						currScene = GameScene::tutorial_1;
 					}
-					else {
+					else if(currScene == GameScene::tutorial_1) {
 						currScene = GameScene::tutorial_2;
+					}
+					else if (currScene == GameScene::tutorial_2) {
+						currScene = GameScene::tutorial_3;
+					}
+					else if (currScene == GameScene::tutorial_3) {
+						currScene = GameScene::level_1;
+					}
+					else if (currScene == GameScene::level_1) {
+						currScene = GameScene::level_2;
+					}
+					else if (currScene == GameScene::level_2) {
+						currScene = GameScene::level_3;
+					}
+					else if (currScene == GameScene::level_3) {
+						currScene = GameScene::level_4;
+					}
+					else if (currScene == GameScene::level_4) {
+						currScene = GameScene::level_5;
+					}
+					else if (currScene == GameScene::level_5) {
+						currScene = GameScene::boss_level_1;
+					}
+					else if (currScene == GameScene::boss_level_1) {
+						currScene = GameScene::boss_level_2;
+					}
+					else if (currScene == GameScene::boss_level_2) {
+						currScene = GameScene::boss_level_3;
 					}
 					Reload();
 				}
@@ -509,8 +694,8 @@ void Update(RenderWindow& window) {
 			float wallBottom = wBounds.top + wBounds.height;
 
 			// if spiked then kill else collide
-			if ((*s)->getType() == 4) {
-				player->setPosition({ 64,64 });
+			if ((*s)->getType() == 4 || (*s)->getType() == 8) {
+				player->setPosition({ initialPlayerPosition });
 				player->resetVelocity(0, 0);
 			}
 			else {

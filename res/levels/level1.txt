@@ -1,14 +1,15 @@
-wwwwwwwwwwwwwwwwwwwwwwwwwwwwww
-w                            w
-w                            w
-w                            w
-w                            w
-w                            w
-w                            w
-w                            w
-w                            w
-w                            w
-w                            w
-w                            w
-w                            w
-wwwwwwwwwwwwwwwwwwwwwwwwwwwwww
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+a   bb                       a
+a  bbb          gggggg       a
+a   asaaaaas   bbbbbbb     saa
+aa  aa     aaaa      b     aaa
+a  aa          bbbbbbb       a
+aaa         ggaaaaaaaaaaaaggga
+a   aaaaaaaabb            bbba
+a   a  g   g                 a
+a   b  b   g    aa           a
+a   a      g                 a
+a          g        aa      ea
+a          b                 a
+ass   sss      ss   ss  s  ssa
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
