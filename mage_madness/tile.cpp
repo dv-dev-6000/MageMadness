@@ -45,6 +45,10 @@ Tile::Tile(int type, sf::Vector2f pos) : Entity() {
 			// if area1 wall
 			setTexture(area1BlockTileTex);
 			break;
+		case 8:
+			// if updown spikes
+			setTexture(upDownSpikesTex);
+			break;
 		default:
 			break;
 	}

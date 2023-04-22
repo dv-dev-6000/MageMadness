@@ -13,6 +13,7 @@ extern sf::Texture spikeTileTex;
 extern sf::Texture bossBlockTileTex;
 extern sf::Texture area1BlockTileTex;
 extern sf::Texture endBlockTileTex;
+extern sf::Texture upDownSpikesTex;
 //extern sf::Texture endTileTex;
 
 extern sf::Texture playerTex;
