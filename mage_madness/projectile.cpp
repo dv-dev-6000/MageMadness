@@ -56,11 +56,11 @@ bool Projectile::getState() {
 
 void  Projectile::resetProjectile() {
 	_isActive = false;
-	_dest = { -10,-10 };
+	_dest = { 0,0 };
 	_angleShot = 0;
 	_angleShot2 = 0;
 	_speed = 500;
-	setPosition({ 0,0 });
+	setPosition({-10,-10 });
 }
 
 void Projectile::collision(const float& dt, sf::FloatRect collision, sf::FloatRect wall, int dmg) {

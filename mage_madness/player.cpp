@@ -10,6 +10,12 @@ const Keyboard::Key keyControls[3] = {
     Keyboard::Space,		// Player jump
 };
 
+const Keyboard::Key keyControlsLefty[3] = {
+    Keyboard::Left,		    // Player left
+    Keyboard::Right,		// Player right
+    Keyboard::RControl,		// Player jump
+};
+
 const Mouse::Button mouseControls[2] = {
     Mouse::Left,		    // M left
     Mouse::Right,		    // M right
@@ -36,14 +42,18 @@ Player::Player() : Entity() {
 void Player::Update(const float& dt) {
 
     //left
-    if (Keyboard::isKeyPressed(keyControls[0])) {
+    if ((Keyboard::isKeyPressed(keyControls[0]) && conScheme == 1) || (Keyboard::isKeyPressed(keyControlsLefty[0]) && conScheme == 2)){
         
         _velocityX = -_speed;
+        // flip sprite
+        setTextureRect(sf::IntRect(Vector2(45, 0), Vector2(-45, 64)));
     }
     //right
-    else if (Keyboard::isKeyPressed(keyControls[1])) {
+    else if ((Keyboard::isKeyPressed(keyControls[1]) && conScheme == 1) || (Keyboard::isKeyPressed(keyControlsLefty[1]) && conScheme == 2)) {
         
         _velocityX = _speed;
+        
+        setTextureRect(IntRect(Vector2(0, 0), Vector2(45, 64)));
     }
     else {
         _velocityX = 0;

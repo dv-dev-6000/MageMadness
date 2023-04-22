@@ -61,6 +61,7 @@ std::shared_ptr<TeleProjectile> tp;
 // var for current game scene
 GameScene currScene;
 GameState currState;
+int conScheme; // 1=right, 2=left, 3=controler
 
 // menu scenes
 bool optionMenuOpen;
@@ -84,6 +85,7 @@ sf::Texture buttonTex;
 sf::Texture enemyTurTex;
 sf::Texture enemySpikeyTex;
 
+// backdrop sprite
 sf::Sprite menuBackdropSprite;
 
 // Player/enemies position values
@@ -107,6 +109,71 @@ void ResetWindow(RenderWindow& window) {
 	window.setView(view);
 }
 
+void PressButton(int id, RenderWindow& window) {
+
+	switch (id)
+	{
+		// determine action based on pressed button id
+		case 1:
+			// start from level one
+			currScene = GameScene::tutorial_1;
+			Reload();
+			break;
+		case 2:
+			// load level to start from
+			break;
+		case 3:
+			// display how to play panel
+			howToPlayOpen = true;
+			Reload();
+			break;
+		case 4:
+			// open options
+			optionMenuOpen = true;
+			Reload();
+			break;
+		case 5:
+			// full screen hd
+			window.create(VideoMode(desktop.size, desktop.bitsPerPixel), "MageMadness", sf::Style::Fullscreen);
+			view.setSize({ hdGameWidth, hdGameHeight });
+			ResetWindow(window);
+			break;
+		case 6:
+			// windowed
+			window.create(VideoMode({ 1280, 720 }), "MageMadness", sf::Style::Default);
+			view.setSize({ hdGameWidth, hdGameHeight });
+			ResetWindow(window);
+			break;
+		case 7:
+			// windowed 4:3
+			// minimaize and change aspect ratio -- move to options menu
+			window.create(VideoMode({ 800,600 }, desktop.bitsPerPixel), "MageMadness", sf::Style::Default);
+			view.setSize({ hdGameWidth, hdGameHeight + (hdGameHeight / 3) });
+			ResetWindow(window);
+			break;
+		case 8:
+			// right hand
+			conScheme = 1;
+			break;
+		case 9:
+			// left hand
+			conScheme = 2;
+			break;
+		case 10:
+			// gamepad
+			conScheme = 3;
+			break;
+		case 11:
+			// back
+			optionMenuOpen = false;
+			howToPlayOpen = false;
+			Reload();
+			break;
+		default:
+			break;
+	}
+
+}
 
 // Initialise ===========================================================================================================
 
@@ -118,6 +185,7 @@ void Init() {
 	// set current game scene
 	currScene = GameScene::mainMenu;
 	currState = GameState::playing;
+	conScheme = 1;
 	optionMenuOpen = false;
 	howToPlayOpen = false;
 }
@@ -205,13 +273,15 @@ void Reload() {
 	// load player + add player to em list
 	player = std::make_shared<Player>();
 	entityManager.list.push_back(player);
-	// load projectiles 
-	for (int i = 0; i < 10; i++) {
 
+	// load projectiles to pool
+	for (int i = 0; i < 20; i++) {
+	
 		std::shared_ptr<Projectile> p = std::make_shared<Projectile>();
 		projectiles.push_back(p);
 		entityManager.list.push_back(p);
 	}
+	
 	// load single tele projectile + add tp to em list
 	tp = std::make_shared<TeleProjectile>();
 	entityManager.list.push_back(tp);
@@ -231,6 +301,7 @@ void Reload() {
 			titleText.setString("Mage Madness");
 			titleText.setPosition({ (view.getSize().x * .5f) - (titleText.getLocalBounds().width * .5f), 150 });
 			
+			// add buttons
 			if (!optionMenuOpen && !howToPlayOpen) {
 				
 				// load buttons main menu
@@ -399,16 +470,16 @@ void Reload() {
 	entityManager.list.push_back(enemySpikey);
 }
 
-
-// Update Loop ==========================================================================================================
-
+// =========================================================================================================================================================
+// Update Loop 
+//__________________________________________________________________________________________________________________________________________________________
 void Update(RenderWindow& window) {
 
 	// Reset clock, recalculate deltatime
 	static Clock clock;
 	float dt = clock.restart().asSeconds();
 
-	// check and consume events
+	// check and consume events ----------------------------------------------------------------------------------------------------------------------------
 	Event event;
 	while (window.pollEvent(event)) {
 
@@ -419,18 +490,10 @@ void Update(RenderWindow& window) {
 			if (currState == GameState::playing) {
 
 				// prep Jump
-				if (event.key.code == Keyboard::Space) {
+				if ((event.key.code == Keyboard::Space && conScheme == 1) ||
+					(event.key.code == Keyboard::RControl && conScheme == 2)){
 
 					player->jumpPressed();
-				}
-				// flip player sprite
-				if (event.key.code == Keyboard::D) {
-
-					player->setTextureRect(IntRect(Vector2(0, 0), Vector2(45, 64)));
-				}
-				if (event.key.code == Keyboard::A) {
-
-					player->setTextureRect(sf::IntRect(Vector2(45, 0), Vector2(-45, 64)));
 				}
 			}
 
@@ -447,22 +510,16 @@ void Update(RenderWindow& window) {
 			// player events if playing
 			if (currState == GameState::playing) {
 
-				if (event.key.code == Keyboard::Space) {
+				if ((event.key.code == Keyboard::Space && conScheme == 1) ||
+					(event.key.code == Keyboard::RControl && conScheme == 2)){
 
 					player->jumpReleased();
 				}
+			}
 
-				// TESTING SCENE SKIP
-				if (event.key.code == Keyboard::Right) {
+			if (event.key.code == Keyboard::Equal){
 
-					if (currScene == GameScene::mainMenu) {
-						currScene = GameScene::tutorial_1;
-					}
-					else {
-						currScene = GameScene::tutorial_2;
-					}
-					Reload();
-				}
+				conScheme = 1;
 			}
 		}
 
@@ -486,67 +543,10 @@ void Update(RenderWindow& window) {
 
 						int id = (*buts)->isSelected();
 						if (id != 0) {
-							
-							switch(id)
-							{
-								// determine action based on pressed button id
-								case 1:
-									// start from level one
-									currScene = GameScene::tutorial_1;
-									Reload();
-									break;
-								case 2:
-									// load level to start from
-									break;
-								case 3:
-									// display how to play panel
-									howToPlayOpen = true;
-									Reload();
-									break;
-								case 4:
-									// open options
-									optionMenuOpen = true;
-									Reload();
-									break;
-								case 5:
-									// full screen hd
-									window.create(VideoMode(desktop.size, desktop.bitsPerPixel), "MageMadness", sf::Style::Fullscreen);
-									view.setSize({ hdGameWidth, hdGameHeight });
-									ResetWindow(window);
-									break;
-								case 6:
-									// windowed
-									window.create(VideoMode({ 1280, 720 }), "MageMadness", sf::Style::Default);
-									view.setSize({ hdGameWidth, hdGameHeight });
-									ResetWindow(window);
-									break;
-								case 7:
-									// windowed 4:3
-									// minimaize and change aspect ratio -- move to options menu
-									window.create(VideoMode({ 800,600 }, desktop.bitsPerPixel), "MageMadness", sf::Style::Default);
-									view.setSize({ hdGameWidth, hdGameHeight + (hdGameHeight / 3) });
-									ResetWindow(window);
-									break;
-								case 8:
-									// right hand
-									break;
-								case 9:
-									// left hand
-									break;
-								case 10:
-									// gamepad
-									break;
-								case 11:
-									// back
-									optionMenuOpen = false;
-									howToPlayOpen = false;
-									Reload();
-									break;
-								default:
-									break;
-							}
+							PressButton(id, window);
 							break;
 						}
+						
 					}
 				}
 				
@@ -565,6 +565,7 @@ void Update(RenderWindow& window) {
 			return;
 		}
 	}
+	//------------------------------------------------------------------------------------------------------------------------------------------------------
 
 	// update entities
 	if (currScene != GameScene::mainMenu) {
@@ -574,13 +575,13 @@ void Update(RenderWindow& window) {
 		menuButtonManager.update(dt);
 	}
 
-	// check collision with walls
+	// check walls for collision ===========================================================================================================================
 	for (auto s = begin(tiles); s != end(tiles); ++s) {
 
 		// get bounds for wall
 		sf::FloatRect wBounds = (*s)->getGlobalBounds();
 
-		//check projectile collision
+		//check projectile collision -----------------------------------------------------------------------------------------------------------------------
 		for (auto it = begin(projectiles); it != end(projectiles); ++it) {
 
 			// get projectile bounds
@@ -601,7 +602,7 @@ void Update(RenderWindow& window) {
 			}
 		}
 
-		// check gravblocks
+		// check gravblocks --------------------------------------------------------------------------------------------------------------------------------
 		if ((*s)->getType() == 2) {
 			// tmp collision bool
 			bool isColliding = false;
@@ -622,7 +623,7 @@ void Update(RenderWindow& window) {
 		}
 
 
-		// check tp projectile collision
+		// check tp projectile collision --------------------------------------------------------------------------------------------------------------------
 		// get projectile bounds
 		sf::FloatRect tpBounds = tp->getGlobalBounds();
 		// get collision data
@@ -637,7 +638,7 @@ void Update(RenderWindow& window) {
 		}
 
 
-		//check player collision 
+		//check player collision ----------------------------------------------------------------------------------------------------------------------------
 		sf::FloatRect pBounds = player->getGlobalBounds();
 		optional collision = wBounds.findIntersection(pBounds);
 
@@ -685,23 +686,27 @@ void Update(RenderWindow& window) {
 			}
 		}
 	}
+	//=======================================================================================================================================================
 
 	// check if turrets can shoot		*** once multiple turrets supported this shoudld cycle through a list of all turrets
 	if (enemyTurret->Shoot()) {
 
-		std::shared_ptr<Projectile> p = std::make_shared<Projectile>();
-		projectiles.push_back(p);
-		entityManager.list.push_back(p);
-		
-		p->fireMe(enemyTurret->getPosition(), player->getPosition(), 1, 300);
+		// iterate through projectile pool, excluding element zero (reserved for player)
+		for (auto it = 1; it < projectiles.size(); it++) {
 
+			// find an inactive projectile in pool
+			if (!projectiles[it]->getState()) {
+
+				projectiles[it]->fireMe(enemyTurret->getPosition(), player->getPosition(), 1, 300);
+				break;
+			}
+		}
 	}
-
 }
 
-
-// Draw =================================================================================================================
-
+//===========================================================================================================================================================
+// Draw 
+//___________________________________________________________________________________________________________________________________________________________
 void Render(RenderWindow& window) {
 	// Draw Everything
 	if (currScene == GameScene::mainMenu) {
