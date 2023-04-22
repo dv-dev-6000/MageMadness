@@ -26,3 +26,6 @@ extern sf::Font pixFont;
 extern sf::Texture enemyTurTex;
 extern sf::Texture enemySpikeyTex;
 
+// control state
+extern int conScheme;
+

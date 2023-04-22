@@ -48,9 +48,11 @@ enum class GameState {
 
 // entities & lists  
 EntityManager entityManager;
+EntityManager menuButtonManager;
 
 std::vector<shared_ptr<Tile>> tiles;
 std::vector<shared_ptr<Projectile>> projectiles;
+std::vector<shared_ptr<Button>> buttons;
 std::shared_ptr<Player> player;
 std::shared_ptr<EnemyTurret> enemyTurret;		// ** to do - if adding more turrets then they will need to be stored in a vector like projectiles
 std::shared_ptr<EnemySpikey> enemySpikey;
@@ -59,6 +61,11 @@ std::shared_ptr<TeleProjectile> tp;
 // var for current game scene
 GameScene currScene;
 GameState currState;
+int conScheme; // 1=right, 2=left, 3=controler
+
+// menu scenes
+bool optionMenuOpen;
+bool howToPlayOpen;
 
 // get desktop resolution info
 VideoMode desktop = VideoMode::getDesktopMode();
@@ -71,6 +78,8 @@ Text titleText;
 
 // textures 
 sf::Texture tileTex, breakTileTex, gravTileTex, spikeTileTex, bossBlockTileTex, area1BlockTileTex, endBlockTileTex, upDownSpikesTex;
+sf::Texture tileTex, breakTileTex, gravTileTex, spikeTileTex, bossBlockTileTex, area1BlockTileTex, endBlockTileTex;
+sf::Texture optionsBackdrop, howToBackdrop;
 sf::Texture whiteBallTex;
 sf::Texture playerTex;
 sf::Texture buttonTex;
@@ -81,6 +90,14 @@ sf::Texture enemySpikeyTex;
 Time elapsedTime;
 Clock r;
 Vector2f initialPlayerPosition;
+// backdrop sprite
+sf::Sprite menuBackdropSprite;
+
+// Player/enemies position values
+Vector2f playerPosition(100, 100);
+Vector2f enemTurPosition(1250, 350);
+Vector2f enemSpikPosition(250,350);
+
 
 // Game Methods ===========================================================================================================
 
@@ -97,6 +114,71 @@ void ResetWindow(RenderWindow& window) {
 	window.setView(view);
 }
 
+void PressButton(int id, RenderWindow& window) {
+
+	switch (id)
+	{
+		// determine action based on pressed button id
+		case 1:
+			// start from level one
+			currScene = GameScene::tutorial_1;
+			Reload();
+			break;
+		case 2:
+			// load level to start from
+			break;
+		case 3:
+			// display how to play panel
+			howToPlayOpen = true;
+			Reload();
+			break;
+		case 4:
+			// open options
+			optionMenuOpen = true;
+			Reload();
+			break;
+		case 5:
+			// full screen hd
+			window.create(VideoMode(desktop.size, desktop.bitsPerPixel), "MageMadness", sf::Style::Fullscreen);
+			view.setSize({ hdGameWidth, hdGameHeight });
+			ResetWindow(window);
+			break;
+		case 6:
+			// windowed
+			window.create(VideoMode({ 1280, 720 }), "MageMadness", sf::Style::Default);
+			view.setSize({ hdGameWidth, hdGameHeight });
+			ResetWindow(window);
+			break;
+		case 7:
+			// windowed 4:3
+			// minimaize and change aspect ratio -- move to options menu
+			window.create(VideoMode({ 800,600 }, desktop.bitsPerPixel), "MageMadness", sf::Style::Default);
+			view.setSize({ hdGameWidth, hdGameHeight + (hdGameHeight / 3) });
+			ResetWindow(window);
+			break;
+		case 8:
+			// right hand
+			conScheme = 1;
+			break;
+		case 9:
+			// left hand
+			conScheme = 2;
+			break;
+		case 10:
+			// gamepad
+			conScheme = 3;
+			break;
+		case 11:
+			// back
+			optionMenuOpen = false;
+			howToPlayOpen = false;
+			Reload();
+			break;
+		default:
+			break;
+	}
+
+}
 
 // Initialise ===========================================================================================================
 
@@ -108,6 +190,9 @@ void Init() {
 	// set current game scene
 	currScene = GameScene::mainMenu;
 	currState = GameState::playing;
+	conScheme = 1;
+	optionMenuOpen = false;
+	howToPlayOpen = false;
 }
 
 // Load Content =========================================================================================================
@@ -141,6 +226,14 @@ void Load() {
 	if (!upDownSpikesTex.loadFromFile("res/img/SpikesUpDown.png")) {
 		cerr << "Failed to load spritesheet!" << std::endl;
 	}
+
+	if (!optionsBackdrop.loadFromFile("res/img/optionsMM.png")) {
+		cerr << "Failed to load spritesheet!" << std::endl;
+	}
+	if (!howToBackdrop.loadFromFile("res/img/howtoMM.png")) {
+		cerr << "Failed to load spritesheet!" << std::endl;
+	}
+
 	// load player textures
 	if (!playerTex.loadFromFile("res/img/PlayerSheet.png")) {
 		cerr << "Failed to load spritesheet!" << std::endl;
@@ -179,6 +272,8 @@ void Reload() {
 	tiles.clear();
 	projectiles.clear();
 	entityManager.list.clear();
+	menuButtonManager.list.clear();
+	buttons.clear();
 	titleText.setString(" ");
 
 	// re-populate lists -------------------------------------------------
@@ -186,13 +281,15 @@ void Reload() {
 	// load player + add player to em list
 	player = std::make_shared<Player>();
 	entityManager.list.push_back(player);
-	// load projectiles 
-	for (int i = 0; i < 10; i++) {
 
+	// load projectiles to pool
+	for (int i = 0; i < 20; i++) {
+	
 		std::shared_ptr<Projectile> p = std::make_shared<Projectile>();
 		projectiles.push_back(p);
 		entityManager.list.push_back(p);
 	}
+	
 	// load single tele projectile + add tp to em list
 	tp = std::make_shared<TeleProjectile>();
 	entityManager.list.push_back(tp);
@@ -208,11 +305,71 @@ void Reload() {
 		case GameScene::mainMenu:
 
 			// main menu logic here
-
-			titleText.setCharacterSize(64);
+			titleText.setCharacterSize(100);
 			titleText.setString("Mage Madness");
-			titleText.setPosition({ (view.getSize().x * .5f) - (titleText.getLocalBounds().width * .5f), (view.getSize().y * .5f) - (titleText.getLocalBounds().height * .5f) });
+			titleText.setPosition({ (view.getSize().x * .5f) - (titleText.getLocalBounds().width * .5f), 150 });
 			
+			// add buttons
+			if (!optionMenuOpen && !howToPlayOpen) {
+				
+				// load buttons main menu
+				std::shared_ptr<Button> but1 = make_shared<Button>("New Game", 40, sf::Vector2f((view.getCenter().x - 224), 400), 1);
+				menuButtonManager.list.push_back(but1);
+				buttons.push_back(but1);
+
+				std::shared_ptr<Button> but2 = make_shared<Button>("Continue", 40, sf::Vector2f((view.getCenter().x - 224), 550), 2);
+				menuButtonManager.list.push_back(but2);
+				buttons.push_back(but2);
+
+				std::shared_ptr<Button> but3 = make_shared<Button>("How To Play", 35, sf::Vector2f((view.getCenter().x - 224), 700), 3);
+				menuButtonManager.list.push_back(but3);
+				buttons.push_back(but3);
+
+				std::shared_ptr<Button> but4 = make_shared<Button>("Options", 40, sf::Vector2f((view.getCenter().x - 224), 850), 4);
+				menuButtonManager.list.push_back(but4);
+				buttons.push_back(but4);
+			}
+			else if (optionMenuOpen) {
+				// add backdrop image
+				menuBackdropSprite.setTexture(optionsBackdrop);
+				// load buttons option menu
+				std::shared_ptr<Button> but5 = make_shared<Button>("Do it!", 35, sf::Vector2f(100, 400), 5);
+				menuButtonManager.list.push_back(but5);
+				buttons.push_back(but5);
+
+				std::shared_ptr<Button> but6 = make_shared<Button>("Do it!", 35, sf::Vector2f(100, 630), 6);
+				menuButtonManager.list.push_back(but6);
+				buttons.push_back(but6);
+
+				std::shared_ptr<Button> but7 = make_shared<Button>("Do it!", 35, sf::Vector2f(100, 865), 7);
+				menuButtonManager.list.push_back(but7);
+				buttons.push_back(but7);
+
+				std::shared_ptr<Button> but8 = make_shared<Button>("Do it!", 35, sf::Vector2f((view.getCenter().x - 224), 400), 8);
+				menuButtonManager.list.push_back(but8);
+				buttons.push_back(but8);
+
+				std::shared_ptr<Button> but9 = make_shared<Button>("Do it!", 35, sf::Vector2f((view.getCenter().x - 224), 750), 9);
+				menuButtonManager.list.push_back(but9);
+				buttons.push_back(but9);
+
+				std::shared_ptr<Button> but10 = make_shared<Button>("Do it!", 35, sf::Vector2f(1380, 470), 10);
+				menuButtonManager.list.push_back(but10);
+				buttons.push_back(but10);
+
+				std::shared_ptr<Button> but11 = make_shared<Button>("Back", 35, sf::Vector2f(1380,910), 11);
+				menuButtonManager.list.push_back(but11);
+				buttons.push_back(but11);
+			}
+			else if (howToPlayOpen) {
+				// add backdrop image
+				menuBackdropSprite.setTexture(howToBackdrop);
+				// load buttons how to play
+				std::shared_ptr<Button> but11 = make_shared<Button>("Back", 35, sf::Vector2f((view.getCenter().x - 224), 800), 11);
+				menuButtonManager.list.push_back(but11);
+				buttons.push_back(but11);
+			}
+
 			break;
 
 		case GameScene::tutorial_1:
@@ -480,16 +637,16 @@ void Reload() {
 	entityManager.list.push_back(enemySpikey);
 }
 
-
-// Update Loop ==========================================================================================================
-
+// =========================================================================================================================================================
+// Update Loop 
+//__________________________________________________________________________________________________________________________________________________________
 void Update(RenderWindow& window) {
 
 	// Reset clock, recalculate deltatime
 	static Clock clock;
 	float dt = clock.restart().asSeconds();
 
-	// check and consume events
+	// check and consume events ----------------------------------------------------------------------------------------------------------------------------
 	Event event;
 	while (window.pollEvent(event)) {
 
@@ -500,18 +657,10 @@ void Update(RenderWindow& window) {
 			if (currState == GameState::playing) {
 
 				// prep Jump
-				if (event.key.code == Keyboard::Space) {
+				if ((event.key.code == Keyboard::Space && conScheme == 1) ||
+					(event.key.code == Keyboard::RControl && conScheme == 2)){
 
 					player->jumpPressed();
-				}
-				// flip player sprite
-				if (event.key.code == Keyboard::D) {
-
-					player->setTextureRect(IntRect(Vector2(0, 0), Vector2(45, 64)));
-				}
-				if (event.key.code == Keyboard::A) {
-
-					player->setTextureRect(sf::IntRect(Vector2(45, 0), Vector2(-45, 64)));
 				}
 			}
 
@@ -528,7 +677,8 @@ void Update(RenderWindow& window) {
 			// player events if playing
 			if (currState == GameState::playing) {
 
-				if (event.key.code == Keyboard::Space) {
+				if ((event.key.code == Keyboard::Space && conScheme == 1) ||
+					(event.key.code == Keyboard::RControl && conScheme == 2)){
 
 					player->jumpReleased();
 				}
@@ -573,20 +723,9 @@ void Update(RenderWindow& window) {
 				}
 			}
 
+			if (event.key.code == Keyboard::Equal){
 
-			if (event.key.code == Keyboard::F1) {
-
-				// minimaize and change aspect ratio -- move to options menu
-				window.create(VideoMode({ 800,600 }, desktop.bitsPerPixel), "MageMadness", sf::Style::Default);
-				view.setSize({ hdGameWidth, hdGameHeight + (hdGameHeight / 3) });
-				ResetWindow(window);
-			}
-			if (event.key.code == Keyboard::F2) {
-
-				// full screen hd
-				window.create(VideoMode(desktop.size, desktop.bitsPerPixel), "MageMadness", sf::Style::Fullscreen);
-				view.setSize({ hdGameWidth, hdGameHeight });
-				ResetWindow(window);
+				conScheme = 1;
 			}
 		}
 
@@ -594,10 +733,29 @@ void Update(RenderWindow& window) {
 		{
 			if (event.mouseButton.button == sf::Mouse::Left) {
 
-				// map mouse coords to world coords
-				sf::Vector2f mousePosition = window.mapPixelToCoords(sf::Mouse::getPosition(window));
+				// determine if ingame or main menu
+				if (currScene != GameScene::mainMenu) {
 
-				projectiles[0]->fireMe(player->getPosition(), mousePosition, 2, 500);
+					// if ingame shoot projectile
+					
+					// map mouse coords to world coords
+					sf::Vector2f mousePosition = window.mapPixelToCoords(sf::Mouse::getPosition(window));
+					projectiles[0]->fireMe(player->getPosition(), mousePosition, 2, 500);
+				}
+				else {
+
+					//if in menu, find if button is clicked and get button id
+					for (auto buts = begin(buttons); buts != end(buttons); ++buts) {
+
+						int id = (*buts)->isSelected();
+						if (id != 0) {
+							PressButton(id, window);
+							break;
+						}
+						
+					}
+				}
+				
 			}
 			if (event.mouseButton.button == sf::Mouse::Right) {
 
@@ -613,22 +771,23 @@ void Update(RenderWindow& window) {
 			return;
 		}
 	}
+	//------------------------------------------------------------------------------------------------------------------------------------------------------
 
 	// update entities
 	if (currScene != GameScene::mainMenu) {
 		entityManager.update(dt);
 	}
 	else {
-
+		menuButtonManager.update(dt);
 	}
 
-	// check collision with walls
+	// check walls for collision ===========================================================================================================================
 	for (auto s = begin(tiles); s != end(tiles); ++s) {
 
 		// get bounds for wall
 		sf::FloatRect wBounds = (*s)->getGlobalBounds();
 
-		//check projectile collision
+		//check projectile collision -----------------------------------------------------------------------------------------------------------------------
 		for (auto it = begin(projectiles); it != end(projectiles); ++it) {
 
 			// get projectile bounds
@@ -649,7 +808,7 @@ void Update(RenderWindow& window) {
 			}
 		}
 
-		// check gravblocks
+		// check gravblocks --------------------------------------------------------------------------------------------------------------------------------
 		if ((*s)->getType() == 2) {
 			// tmp collision bool
 			bool isColliding = false;
@@ -670,7 +829,7 @@ void Update(RenderWindow& window) {
 		}
 
 
-		// check tp projectile collision
+		// check tp projectile collision --------------------------------------------------------------------------------------------------------------------
 		// get projectile bounds
 		sf::FloatRect tpBounds = tp->getGlobalBounds();
 		// get collision data
@@ -685,7 +844,7 @@ void Update(RenderWindow& window) {
 		}
 
 
-		//check player collision 
+		//check player collision ----------------------------------------------------------------------------------------------------------------------------
 		sf::FloatRect pBounds = player->getGlobalBounds();
 		optional collision = wBounds.findIntersection(pBounds);
 
@@ -733,27 +892,36 @@ void Update(RenderWindow& window) {
 			}
 		}
 	}
+	//=======================================================================================================================================================
 
 	// check if turrets can shoot		*** once multiple turrets supported this shoudld cycle through a list of all turrets
 	if (enemyTurret->Shoot()) {
 
-		std::shared_ptr<Projectile> p = std::make_shared<Projectile>();
-		projectiles.push_back(p);
-		entityManager.list.push_back(p);
-		
-		p->fireMe(enemyTurret->getPosition(), player->getPosition(), 1, 300);
+		// iterate through projectile pool, excluding element zero (reserved for player)
+		for (auto it = 1; it < projectiles.size(); it++) {
 
+			// find an inactive projectile in pool
+			if (!projectiles[it]->getState()) {
+
+				projectiles[it]->fireMe(enemyTurret->getPosition(), player->getPosition(), 1, 300);
+				break;
+			}
+		}
 	}
-
 }
 
-
-// Draw =================================================================================================================
-
+//===========================================================================================================================================================
+// Draw 
+//___________________________________________________________________________________________________________________________________________________________
 void Render(RenderWindow& window) {
 	// Draw Everything
 	if (currScene == GameScene::mainMenu) {
 		window.draw(titleText);
+		if (optionMenuOpen || howToPlayOpen) { 
+			window.draw(menuBackdropSprite);
+		}
+		menuButtonManager.render(window);
+		Renderer::render();
 	}
 	else {
 		entityManager.render(window);
