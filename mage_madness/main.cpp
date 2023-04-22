@@ -78,7 +78,6 @@ Text titleText;
 
 // textures 
 sf::Texture tileTex, breakTileTex, gravTileTex, spikeTileTex, bossBlockTileTex, area1BlockTileTex, endBlockTileTex, upDownSpikesTex;
-sf::Texture tileTex, breakTileTex, gravTileTex, spikeTileTex, bossBlockTileTex, area1BlockTileTex, endBlockTileTex;
 sf::Texture optionsBackdrop, howToBackdrop;
 sf::Texture whiteBallTex;
 sf::Texture playerTex;
@@ -86,9 +85,6 @@ sf::Texture buttonTex;
 sf::Texture enemyTurTex;
 sf::Texture enemySpikeyTex;
 
-// For turret fire time
-Time elapsedTime;
-Clock r;
 Vector2f initialPlayerPosition;
 // backdrop sprite
 sf::Sprite menuBackdropSprite;
