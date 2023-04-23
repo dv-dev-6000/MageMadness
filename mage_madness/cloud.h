@@ -28,4 +28,6 @@ extern sf::Texture enemySpikeyTex;
 
 // control state
 extern int conScheme;
+// cursor
+extern sf::Sprite cursor;
 

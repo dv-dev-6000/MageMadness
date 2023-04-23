@@ -23,7 +23,7 @@ Button::Button(std::string text, int textSize, sf::Vector2f pos, int id) : Entit
 
 void Button::Update(const float& dt) {
 
-	if (getGlobalBounds().contains(_mousePosition)) {
+	if (getGlobalBounds().contains(cursor.getPosition())) {
 		setColor(sf::Color::Green);
 		_selected = true;
 	}
@@ -46,7 +46,6 @@ int Button::isSelected() {
 
 void Button::Render(sf::RenderWindow& window) {
 
-	_mousePosition = window.mapPixelToCoords(sf::Mouse::getPosition(window));
 	window.draw(_buttonText);
 	Renderer::queue(this);
 }

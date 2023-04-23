@@ -6,7 +6,6 @@ class Button : public Entity {
 protected:
 
     sf::Text _buttonText;
-    sf::Vector2f _mousePosition;
     bool _selected;
     int _id;
 

@@ -67,6 +67,11 @@ int conScheme; // 1=right, 2=left, 3=controler
 bool optionMenuOpen;
 bool howToPlayOpen;
 
+// cursor move with controller
+int moveX;
+int moveY;
+const int cursorSpeed = 1000;
+
 // get desktop resolution info
 VideoMode desktop = VideoMode::getDesktopMode();
 // create view object (used to scale content with window size and adjust aspect ratio) 
@@ -79,6 +84,7 @@ Text titleText;
 // textures 
 sf::Texture tileTex, breakTileTex, gravTileTex, spikeTileTex, bossBlockTileTex, area1BlockTileTex, endBlockTileTex, upDownSpikesTex;
 sf::Texture optionsBackdrop, howToBackdrop;
+sf::Texture cursorTex;
 sf::Texture whiteBallTex;
 sf::Texture playerTex;
 sf::Texture buttonTex;
@@ -86,8 +92,11 @@ sf::Texture enemyTurTex;
 sf::Texture enemySpikeyTex;
 
 Vector2f initialPlayerPosition;
+
 // backdrop sprite
 sf::Sprite menuBackdropSprite;
+// cursor sprite
+sf::Sprite cursor;
 
 // Player/enemies position values
 Vector2f playerPosition(100, 100);
@@ -176,6 +185,37 @@ void PressButton(int id, RenderWindow& window) {
 
 }
 
+void MoveCursor(float dt) {
+
+	cursor.move({moveX*dt, moveY*dt});
+}
+
+// Left click or controller right shoulder
+void ClickOne(RenderWindow& window) {
+
+	projectiles[0]->fireMe(player->getPosition(), cursor.getPosition(), 2, 500);
+}
+
+// right click or controller left shoulder
+void ClickTwo(RenderWindow& window) {
+
+	tp->fireMe(player->getPosition(), cursor.getPosition(), 1, 500);
+}
+
+void clickButton(RenderWindow& window) {
+	
+	//find if button is clicked and get button id
+	for (auto buts = begin(buttons); buts != end(buttons); ++buts) {
+
+		int id = (*buts)->isSelected();
+		if (id != 0) {
+			PressButton(id, window);
+			break;
+		}
+
+	}
+}
+
 // Initialise ===========================================================================================================
 
 /// <summary>
@@ -189,6 +229,8 @@ void Init() {
 	conScheme = 1;
 	optionMenuOpen = false;
 	howToPlayOpen = false;
+	moveX = false;
+	moveY = false;
 }
 
 // Load Content =========================================================================================================
@@ -229,6 +271,9 @@ void Load() {
 	if (!howToBackdrop.loadFromFile("res/img/howtoMM.png")) {
 		cerr << "Failed to load spritesheet!" << std::endl;
 	}
+	if (!cursorTex.loadFromFile("res/img/Cursor.png")) {
+		cerr << "Failed to load spritesheet!" << std::endl;
+	}
 
 	// load player textures
 	if (!playerTex.loadFromFile("res/img/PlayerSheet.png")) {
@@ -255,6 +300,8 @@ void Load() {
 
 	pixFont.loadFromFile("res/fonts/PressStart2P-Regular.ttf");
 	titleText.setFont(pixFont);
+
+	cursor.setTexture(cursorTex);
 
 	Reload();
 }
@@ -299,6 +346,8 @@ void Reload() {
 	switch (currScene) {
 
 		case GameScene::mainMenu:
+
+			currState = GameState::menu;
 
 			// main menu logic here
 			titleText.setCharacterSize(100);
@@ -371,6 +420,7 @@ void Reload() {
 		case GameScene::tutorial_1:
 
 			// tut 1 logic here
+			currState = GameState::playing;
 
 			// level load
 			ls::loadLevelFile("res/levels/tutOne.txt");
@@ -399,18 +449,19 @@ void Reload() {
 		case GameScene::tutorial_2:
 
 			// tut 2 logic here
-
+			currState = GameState::playing;
 			break;
 
 		case GameScene::tutorial_3:
 
 			// tut 3 logic here
-
+			currState = GameState::playing;
 			break;
 
 		case GameScene::level_1:
 
 			// level 1 logic here
+			currState = GameState::playing;
 			initialPlayerPosition = { 100, 100 };
 			// level load
 			ls::loadLevelFile("res/levels/level1.txt");
@@ -439,6 +490,7 @@ void Reload() {
 		case GameScene::level_2:
 
 			// level 2 logic here
+			currState = GameState::playing;
 			initialPlayerPosition = { 1050,140 };
 			// level load
 			ls::loadLevelFile("res/levels/level2.txt");
@@ -466,6 +518,7 @@ void Reload() {
 		case GameScene::level_3:
 
 			// level 3 logic here
+			currState = GameState::playing;
 			initialPlayerPosition = { 100, 450 };
 			// level load
 			ls::loadLevelFile("res/levels/level3.txt");
@@ -493,6 +546,7 @@ void Reload() {
 		case GameScene::level_4:
 
 			// level 4 logic here
+			currState = GameState::playing;
 			initialPlayerPosition = { 850, 450 };
 			// level load
 			ls::loadLevelFile("res/levels/level4.txt");
@@ -520,6 +574,7 @@ void Reload() {
 		case GameScene::level_5:
 
 			// level 5 logic here
+			currState = GameState::playing;
 			initialPlayerPosition = { 100, 100 };
 			// level load
 			ls::loadLevelFile("res/levels/level5.txt");
@@ -547,6 +602,7 @@ void Reload() {
 		case GameScene::boss_level_1:
 
 			// boss level 1 logic here
+			currState = GameState::playing;
 			initialPlayerPosition = { 100, 250 };
 			// level load
 			ls::loadLevelFile("res/levels/bossLevel1.txt");
@@ -573,6 +629,7 @@ void Reload() {
 		case GameScene::boss_level_2:
 
 			// boss level 2 logic here
+			currState = GameState::playing;
 			initialPlayerPosition = { 700, 150 };
 			// level load
 			ls::loadLevelFile("res/levels/bossLevel2.txt");
@@ -600,6 +657,7 @@ void Reload() {
 		case GameScene::boss_level_3:
 
 			// boss level 3 logic here
+			currState = GameState::playing;
 			initialPlayerPosition = { 1750, 800 };
 			// level load
 			ls::loadLevelFile("res/levels/bossLevel3.txt");
@@ -642,17 +700,29 @@ void Update(RenderWindow& window) {
 	static Clock clock;
 	float dt = clock.restart().asSeconds();
 
+	// get mouse position
+	sf::Vector2f mousePosition = window.mapPixelToCoords(sf::Mouse::getPosition(window));
+
+	// update cursor (mouse & keyboard settings only)
+	if (conScheme != 3) {
+		cursor.setPosition(mousePosition);
+	}
+	else {
+		MoveCursor(dt);
+	}
+
 	// check and consume events ----------------------------------------------------------------------------------------------------------------------------
 	Event event;
 	while (window.pollEvent(event)) {
 
-		// controller (xbox 360)
-		// joy R = xbox Y
-		// joy X = xbox A
-		// joy Y = xbox B
-		// joy Z = xbox X
-		// joy V = rSh		povX = Select
-		// joy U = lSh		povY = Start
+		//=============== controller (xbox 360) ================//
+		// joy R = xbox Y	|	AxisX = left stick rightleft	//
+		// joy X = xbox A	|	AxisU = right stick rightleft	//
+		// joy Y = xbox B	|	AxisV = right stick updown		//
+		// joy Z = xbox X	|									//
+		// joy V = rSh		|	povX = Select					//
+		// joy U = lSh		|	povY = Start					//
+		//======================================================//
 		if (event.type == sf::Event::JoystickMoved) {
 			if (event.joystickMove.axis == Joystick::Axis::X) {
 				
@@ -672,11 +742,16 @@ void Update(RenderWindow& window) {
 			}
 			if (event.joystickMove.axis == Joystick::Axis::U) {
 
-				if (event.joystickMove.position > 0) {
+				if (event.joystickMove.position > 30) {
 					// cursor right
+					moveX = cursorSpeed;
 				}
-				else if (event.joystickMove.position < 0) {
+				else if (event.joystickMove.position < -30) {
 					// cursor left
+					moveX = -cursorSpeed;
+				}
+				else {
+					moveX = 0;
 				}
 
 			}
@@ -684,24 +759,44 @@ void Update(RenderWindow& window) {
 
 				if (event.joystickMove.position > 30) {
 					// cursor up
+					moveY = cursorSpeed;
 				}
 				else if (event.joystickMove.position < -30) {
 					// cursor down
+					moveY = -cursorSpeed;
 				}
-
+				else {
+					moveY = 0;
+				}
 			}
 		}
 		if (event.type == sf::Event::JoystickButtonPressed) {
 			if (event.joystickButton.button == Joystick::X) {
-				player->jumpPressed();
-			}
+				
+				// determine if ingame or main menu
+				if (currState == GameState::playing) {
 
+					// if ingame jump start
+					player->jumpPressed();
+				}
+				else {
+
+					//if in menu button press
+					clickButton(window);
+				}
+				
+			}
 		}
 		if (event.type == sf::Event::JoystickButtonReleased) {
 			if (event.joystickButton.button == Joystick::X) {
 				player->jumpReleased();
 			}
-
+			if (event.joystickButton.button == Joystick::V) {
+				ClickOne(window);
+			}
+			if (event.joystickButton.button == Joystick::U) {
+				ClickTwo(window);
+			}
 		}
 
 		// key pressed events
@@ -788,35 +883,21 @@ void Update(RenderWindow& window) {
 			if (event.mouseButton.button == sf::Mouse::Left) {
 
 				// determine if ingame or main menu
-				if (currScene != GameScene::mainMenu) {
+				if (currState == GameState::playing) {
 
-					// if ingame shoot projectile
-					
-					// map mouse coords to world coords
-					sf::Vector2f mousePosition = window.mapPixelToCoords(sf::Mouse::getPosition(window));
-					projectiles[0]->fireMe(player->getPosition(), mousePosition, 2, 500);
+					// if ingame projectile launch
+					ClickOne(window);
 				}
 				else {
 
-					//if in menu, find if button is clicked and get button id
-					for (auto buts = begin(buttons); buts != end(buttons); ++buts) {
-
-						int id = (*buts)->isSelected();
-						if (id != 0) {
-							PressButton(id, window);
-							break;
-						}
-						
-					}
+					//if in menu button press
+					clickButton(window);
 				}
-				
 			}
 			if (event.mouseButton.button == sf::Mouse::Right) {
 
-				// map mouse coords to world coords
-				sf::Vector2f mousePosition = window.mapPixelToCoords(sf::Mouse::getPosition(window));
-
-				tp->fireMe(player->getPosition(), mousePosition, 1, 500);
+				// TP launch
+				ClickTwo(window);
 			}
 		}
 
@@ -981,6 +1062,9 @@ void Render(RenderWindow& window) {
 		entityManager.render(window);
 		Renderer::render();
 	}
+
+	// draw cursor
+	window.draw(cursor);
 }
 
 int main() {
@@ -993,6 +1077,9 @@ int main() {
 	RenderWindow window(VideoMode(desktop.size, desktop.bitsPerPixel), "MageMadness", sf::Style::Fullscreen);
 	ResetWindow(window);
 	Renderer::initialise(window);
+
+	// hide default mouse cursor
+	window.setMouseCursorVisible(false);
 
 	Init();
 	Load();
