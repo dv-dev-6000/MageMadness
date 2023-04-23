@@ -10,7 +10,7 @@ protected:
     int _id;
 
 public:
-    //Constructor that takes a sprite
+    //Constructor
     Button(std::string text, int textSize, sf::Vector2f pos, int id);
 
     //Update

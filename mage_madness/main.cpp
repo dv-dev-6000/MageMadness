@@ -9,6 +9,7 @@
 #include "enemyTurret.h"
 #include "enemySpikey.h"
 #include "button.h"
+#include "hud.h"
 
 using namespace sf;
 using namespace std;
@@ -57,6 +58,7 @@ std::shared_ptr<Player> player;
 std::shared_ptr<EnemyTurret> enemyTurret;		// ** to do - if adding more turrets then they will need to be stored in a vector like projectiles
 std::shared_ptr<EnemySpikey> enemySpikey;
 std::shared_ptr<TeleProjectile> tp;
+std::shared_ptr<HUD> hud;
 
 // var for current game scene
 GameScene currScene;
@@ -84,6 +86,7 @@ Text titleText;
 // textures 
 sf::Texture tileTex, breakTileTex, gravTileTex, spikeTileTex, bossBlockTileTex, area1BlockTileTex, endBlockTileTex, upDownSpikesTex;
 sf::Texture optionsBackdrop, howToBackdrop, howToBackdropLefty, howToBackdropController;
+sf::Texture hudBaseTex, hudOverTex;
 sf::Texture cursorTex;
 sf::Texture whiteBallTex;
 sf::Texture playerTex;
@@ -117,6 +120,8 @@ void ResetWindow(RenderWindow& window) {
 	window.setFramerateLimit(120);
 	// set window view
 	window.setView(view);
+	// disable cursor
+	window.setMouseCursorVisible(false);
 }
 
 void PressButton(int id, RenderWindow& window) {
@@ -316,6 +321,15 @@ void Load() {
 		cerr << "Failed to load spritesheet!" << std::endl;
 	}
 
+	// load hudbase
+	if (!hudBaseTex.loadFromFile("res/img/HUDbase.png")) {
+		cerr << "Failed to load spritesheet!" << std::endl;
+	}
+	// load hudover
+	if (!hudOverTex.loadFromFile("res/img/HUDover.png")) {
+		cerr << "Failed to load spritesheet!" << std::endl;
+	}
+
 	// Loading enemies
 	if (!enemyTurTex.loadFromFile("res/img/Turret.png"))
 	{
@@ -348,6 +362,10 @@ void Reload() {
 	titleText.setString(" ");
 
 	// re-populate lists -------------------------------------------------
+
+	// load hud
+	hud = std::make_shared<HUD>();
+	entityManager.list.push_back(hud);
 
 	// load player + add player to em list
 	player = std::make_shared<Player>();
@@ -1025,6 +1043,7 @@ void Update(RenderWindow& window) {
 			if ((*s)->getType() == 4 || (*s)->getType() == 8) {
 				player->setPosition({ initialPlayerPosition });
 				player->resetVelocity(0, 0);
+				hud->AddFail();
 			}
 			else {
 

@@ -20,6 +20,9 @@ extern sf::Texture playerTex;
 extern sf::Texture whiteBallTex;
 extern sf::Texture buttonTex;
 
+extern sf::Texture hudBaseTex;
+extern sf::Texture hudOverTex;
+
 extern sf::Font pixFont;
 
 // Enemies
