@@ -83,7 +83,7 @@ Text titleText;
 
 // textures 
 sf::Texture tileTex, breakTileTex, gravTileTex, spikeTileTex, bossBlockTileTex, area1BlockTileTex, endBlockTileTex, upDownSpikesTex;
-sf::Texture optionsBackdrop, howToBackdrop;
+sf::Texture optionsBackdrop, howToBackdrop, howToBackdropLefty, howToBackdropController;
 sf::Texture cursorTex;
 sf::Texture whiteBallTex;
 sf::Texture playerTex;
@@ -134,11 +134,21 @@ void PressButton(int id, RenderWindow& window) {
 			break;
 		case 3:
 			// display how to play panel
+			if (conScheme == 1) {
+				menuBackdropSprite.setTexture(howToBackdrop);
+			}
+			else if (conScheme == 2) {
+				menuBackdropSprite.setTexture(howToBackdropLefty);
+			}
+			else{
+				menuBackdropSprite.setTexture(howToBackdropController);
+			}
 			howToPlayOpen = true;
 			Reload();
 			break;
 		case 4:
 			// open options
+			menuBackdropSprite.setTexture(optionsBackdrop);
 			optionMenuOpen = true;
 			Reload();
 			break;
@@ -164,14 +174,26 @@ void PressButton(int id, RenderWindow& window) {
 		case 8:
 			// right hand
 			conScheme = 1;
+			menuBackdropSprite.setTexture(howToBackdrop);
+			optionMenuOpen = false;
+			howToPlayOpen = true;
+			Reload();
 			break;
 		case 9:
 			// left hand
 			conScheme = 2;
+			menuBackdropSprite.setTexture(howToBackdropLefty);
+			optionMenuOpen = false;
+			howToPlayOpen = true;
+			Reload();
 			break;
 		case 10:
 			// gamepad
 			conScheme = 3;
+			menuBackdropSprite.setTexture(howToBackdropController);
+			optionMenuOpen = false;
+			howToPlayOpen = true;
+			Reload();
 			break;
 		case 11:
 			// back
@@ -269,6 +291,12 @@ void Load() {
 		cerr << "Failed to load spritesheet!" << std::endl;
 	}
 	if (!howToBackdrop.loadFromFile("res/img/howtoMM.png")) {
+		cerr << "Failed to load spritesheet!" << std::endl;
+	}
+	if (!howToBackdropLefty.loadFromFile("res/img/howtoMM_Lefty.png")) {
+		cerr << "Failed to load spritesheet!" << std::endl;
+	}
+	if (!howToBackdropController.loadFromFile("res/img/howtoMM_Controller.png")) {
 		cerr << "Failed to load spritesheet!" << std::endl;
 	}
 	if (!cursorTex.loadFromFile("res/img/Cursor.png")) {
@@ -375,8 +403,6 @@ void Reload() {
 				buttons.push_back(but4);
 			}
 			else if (optionMenuOpen) {
-				// add backdrop image
-				menuBackdropSprite.setTexture(optionsBackdrop);
 				// load buttons option menu
 				std::shared_ptr<Button> but5 = make_shared<Button>("Do it!", 35, sf::Vector2f(100, 400), 5);
 				menuButtonManager.list.push_back(but5);
@@ -407,8 +433,6 @@ void Reload() {
 				buttons.push_back(but11);
 			}
 			else if (howToPlayOpen) {
-				// add backdrop image
-				menuBackdropSprite.setTexture(howToBackdrop);
 				// load buttons how to play
 				std::shared_ptr<Button> but11 = make_shared<Button>("Back", 35, sf::Vector2f((view.getCenter().x - 224), 800), 11);
 				menuButtonManager.list.push_back(but11);
@@ -421,6 +445,7 @@ void Reload() {
 
 			// tut 1 logic here
 			currState = GameState::playing;
+			initialPlayerPosition = { 100, 100 };
 
 			// level load
 			ls::loadLevelFile("res/levels/tutOne.txt");
