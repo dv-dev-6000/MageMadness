@@ -434,7 +434,7 @@ void Reload() {
 			}
 			else if (howToPlayOpen) {
 				// load buttons how to play
-				std::shared_ptr<Button> but11 = make_shared<Button>("Back", 35, sf::Vector2f((view.getCenter().x - 224), 800), 11);
+				std::shared_ptr<Button> but11 = make_shared<Button>("Back", 35, sf::Vector2f(105, 40), 11);
 				menuButtonManager.list.push_back(but11);
 				buttons.push_back(but11);
 			}
