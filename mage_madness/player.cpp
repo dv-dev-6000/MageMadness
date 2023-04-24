@@ -120,6 +120,10 @@ void Player::jumpReleased() {
     }
 }
 
+float Player::getJcharge() {
+    return _jChargeTime;
+}
+
 void Player::resetJump() {
 
     _isAirborn = false;

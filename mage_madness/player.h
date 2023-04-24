@@ -42,4 +42,5 @@ public:
 
     float getVelX();
     float getVelY();
+    float getJcharge();
 };

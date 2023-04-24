@@ -20,10 +20,20 @@ HUD::HUD() : Entity() {
 	_failText.setCharacterSize(30);
 	_failText.setString(_failCountAsText);
 	_failText.setPosition({ 1190 - (_failText.getLocalBounds().width * .5f), 1020 });
+
+	_jumpRect.setPosition({ 309, 985 });
+	_jumpRect.setSize({ 0,26 });
+	_jumpRect.setFillColor(sf::Color::Cyan);
+
+	_spellRect.setPosition({ 309, 1033 });
+	_spellRect.setSize({ 0,26 });
+	_spellRect.setFillColor(sf::Color::Magenta);
 }
 
 void HUD::Update(const float& dt) {
 
+	_spellRect.setSize({ 0,26 });
+	_jumpRect.setSize({ _jumpBarX,26 });
 
 	Entity::Update(dt);
 }
@@ -39,8 +49,23 @@ void HUD::CollectableGained() {
 	setTexture(hudOverTex);
 }
 
+void HUD::JumpX(float val) {
+	
+	if (val > 0) {
+		_jumpBarX = val / 2;
+	}
+	else { _jumpBarX = 0; }
+	
+}
+
+void HUD::SpellX() {
+
+}
+
 void HUD::Render(sf::RenderWindow& window) {
 
+	window.draw(_jumpRect);
+	window.draw(_spellRect);
 	window.draw(_failText);
 	Renderer::queue(this);
 }

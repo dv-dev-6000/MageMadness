@@ -959,6 +959,9 @@ void Update(RenderWindow& window) {
 		menuButtonManager.update(dt);
 	}
 
+	// send info to hud
+	hud->JumpX(player->getJcharge());
+
 	// check walls for collision ===========================================================================================================================
 	for (auto s = begin(tiles); s != end(tiles); ++s) {
 

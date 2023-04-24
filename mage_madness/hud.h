@@ -6,9 +6,13 @@ class HUD : public Entity {
 protected:
 
     int _failCount;
+    float _jumpBarX;
+    float _spellBarX;
     bool _gotCollectable;
     sf::Text _failText;
     std::string _failCountAsText;
+    sf::RectangleShape _jumpRect;
+    sf::RectangleShape _spellRect;
 
 public:
     //Constructor
@@ -22,5 +26,7 @@ public:
     // methods misc.
     void AddFail();
     void CollectableGained();
+    void JumpX(float val);
+    void SpellX();
 
 };
