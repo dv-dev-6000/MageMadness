@@ -10,6 +10,7 @@ Projectile::Projectile() : Entity() {
 
 	setTextureRect(IntRect(Vector2(0, 0), Vector2(16,16)));
 	setTexture(whiteBallTex);
+	setColor(Color::Cyan);
 
 	_dest = {0,0};
 	_isActive = false;
@@ -50,7 +51,6 @@ void Projectile::fireMe(sf::Vector2f startPos, sf::Vector2f destination, int hp,
 
 	_isActive = true;
 	_hp = hp;
-	setColor(Color::Cyan);
 	setPosition(startPos);
 	_dest = destination;
 	_speed = speed;
@@ -101,6 +101,32 @@ void Projectile::Render(sf::RenderWindow& window)
 	Renderer::queue(this);
 }
 
+
+TeleProjectile::TeleProjectile() {
+	
+	_lifeSpan = 1;
+	setColor(sf::Color::Magenta);
+}
+
+void TeleProjectile::Update(const float& dt) {
+
+	if (_isActive) {
+
+		if (_lifeSpan > 0) {
+
+			_lifeSpan -= 1 * dt;
+			//setScale(sf::Vector2f{ _lifeSpan , _lifeSpan });
+		}
+		else {
+
+			resetProjectile();
+			_lifeSpan = 1;
+		}
+	}
+
+	Projectile::Update(dt);
+}
+
 void TeleProjectile::collision(const float& dt, sf::FloatRect collision, sf::FloatRect wall, std::shared_ptr<Player> player) {
 
 	sf::Vector2f newpos = { 0,0 };
@@ -127,4 +153,6 @@ void TeleProjectile::collision(const float& dt, sf::FloatRect collision, sf::Flo
 
 	_hp = 0;
 	resetProjectile();
+	_lifeSpan = 1;
 }
+

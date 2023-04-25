@@ -33,8 +33,13 @@ public:
 class TeleProjectile : public Projectile {
 protected:
 
+    float _lifeSpan;
+
 public:
 
+    //Constructor
+    TeleProjectile();
 
+    void Update(const float& dt) override;
     void collision(const float& dt, sf::FloatRect collision, sf::FloatRect wall, std::shared_ptr<Player> player);
 };
