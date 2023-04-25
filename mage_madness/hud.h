@@ -27,6 +27,6 @@ public:
     void AddFail();
     void CollectableGained();
     void JumpX(float val);
-    void SpellX();
+    void SpellX(float val);
 
 };

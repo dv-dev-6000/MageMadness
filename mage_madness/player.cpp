@@ -28,9 +28,12 @@ Player::Player() : Entity() {
 
     _isAirborn = false;
     _jumpPressed = false;
+    _spellPressed = false;
 
     _jChargeTime = 0;
     _jChargeUnit = 700;
+    _sChargeTime = 0;
+    _sChargeUnit = 1400;
     
     _movingLeft = false;
     _movingRight = false;
@@ -84,6 +87,12 @@ void Player::Update(const float& dt) {
         }
     }
 
+    if (_spellPressed) {
+        if (_sChargeTime < _maxSpellCharge) {
+
+            _sChargeTime += _sChargeUnit * dt;
+        }
+    }
 
     _velocityY += _gravity;
 
@@ -92,12 +101,13 @@ void Player::Update(const float& dt) {
 
 void Player::projectilePressed() {
 
-    
+    _spellPressed = true;
 }
 
 void Player::projectileReleased() {
 
-    
+    _spellPressed = false;
+    _sChargeTime = 0;
 }
 
 void Player::jumpPressed() {
@@ -122,6 +132,10 @@ void Player::jumpReleased() {
 
 float Player::getJcharge() {
     return _jChargeTime;
+}
+
+float Player::getScharge() {
+    return _sChargeTime;
 }
 
 void Player::resetJump() {

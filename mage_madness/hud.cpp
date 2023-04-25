@@ -32,7 +32,7 @@ HUD::HUD() : Entity() {
 
 void HUD::Update(const float& dt) {
 
-	_spellRect.setSize({ 0,26 });
+	_spellRect.setSize({ _spellBarX,26 });
 	_jumpRect.setSize({ _jumpBarX,26 });
 
 	Entity::Update(dt);
@@ -58,8 +58,12 @@ void HUD::JumpX(float val) {
 	
 }
 
-void HUD::SpellX() {
+void HUD::SpellX(float val) {
 
+	if (val > 0) {
+		_spellBarX = val / 2;
+	}
+	else { _spellBarX = 0; }
 }
 
 void HUD::Render(sf::RenderWindow& window) {

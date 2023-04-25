@@ -14,8 +14,13 @@ protected:
     float _jChargeTime;
     float _jChargeUnit;
 
+    const float _maxSpellCharge = 1000;
+    float _sChargeTime;
+    float _sChargeUnit;
+
     bool _isAirborn;
     bool _jumpPressed;
+    bool _spellPressed;
     bool _movingLeft;
     bool _movingRight;
 
@@ -43,4 +48,5 @@ public:
     float getVelX();
     float getVelY();
     float getJcharge();
+    float getScharge();
 };

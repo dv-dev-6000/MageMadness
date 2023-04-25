@@ -10,6 +10,7 @@
 #include "enemySpikey.h"
 #include "button.h"
 #include "hud.h"
+#include "pickup.h"
 
 using namespace sf;
 using namespace std;
@@ -55,6 +56,7 @@ std::vector<shared_ptr<Tile>> tiles;
 std::vector<shared_ptr<Projectile>> projectiles;
 std::vector<shared_ptr<Button>> buttons;
 std::shared_ptr<Player> player;
+std::shared_ptr<PickUp> pickup;
 std::shared_ptr<EnemyTurret> enemyTurret;		// ** to do - if adding more turrets then they will need to be stored in a vector like projectiles
 std::shared_ptr<EnemySpikey> enemySpikey;
 std::shared_ptr<TeleProjectile> tp;
@@ -93,6 +95,7 @@ sf::Texture playerTex;
 sf::Texture buttonTex;
 sf::Texture enemyTurTex;
 sf::Texture enemySpikeyTex;
+sf::Texture pickupTex;
 
 Vector2f initialPlayerPosition;
 
@@ -220,7 +223,13 @@ void MoveCursor(float dt) {
 // Left click or controller right shoulder
 void ClickOne(RenderWindow& window) {
 
-	projectiles[0]->fireMe(player->getPosition(), cursor.getPosition(), 2, 500);
+	if (player->getScharge() < 995) {
+		projectiles[0]->fireMe(player->getPosition(), cursor.getPosition(), 1, 500);
+	}
+	else {
+		projectiles[0]->fireMe(player->getPosition(), cursor.getPosition(), 2, 500);
+	}
+	player->projectileReleased();
 }
 
 // right click or controller left shoulder
@@ -318,6 +327,10 @@ void Load() {
 	}
 	// load projectile textures
 	if (!buttonTex.loadFromFile("res/img/Button.png")) {
+		cerr << "Failed to load spritesheet!" << std::endl;
+	}
+	// load collectable textures
+	if (!pickupTex.loadFromFile("res/img/diamond.png")) {
 		cerr << "Failed to load spritesheet!" << std::endl;
 	}
 
@@ -478,7 +491,7 @@ void Reload() {
 			}
 
 			// set player values
-			player->setTexture(playerTex);
+			//player->setTexture(playerTex);
 			player->setPosition({ 100, 100 });
 			// Set enemy turret values
 			enemyTurret->setTexture(enemyTurTex);
@@ -486,6 +499,9 @@ void Reload() {
 			// Set enemy spikey values
 			enemySpikey->setTexture(enemySpikeyTex);
 			enemySpikey->setPosition({ 250,350 });
+			// set collectable
+			pickup = std::make_shared<PickUp>(sf::Vector2f{ 400, 100 });
+			entityManager.list.push_back(pickup);
 
 			break;
 
@@ -829,6 +845,9 @@ void Update(RenderWindow& window) {
 				}
 				
 			}
+			if (event.joystickButton.button == Joystick::V) {
+				player->projectilePressed();
+			}
 		}
 		if (event.type == sf::Event::JoystickButtonReleased) {
 			if (event.joystickButton.button == Joystick::X) {
@@ -841,8 +860,9 @@ void Update(RenderWindow& window) {
 				ClickTwo(window);
 			}
 		}
+		
 
-		// key pressed events
+		// key pressed events ---------------------------------------------
 		if (event.type == sf::Event::KeyPressed)
 		{
 			// player events if playing
@@ -863,7 +883,7 @@ void Update(RenderWindow& window) {
 			}
 		}
 
-		// key released events
+		// key released events ----------------------------------------------
 		if (event.type == sf::Event::KeyReleased)
 		{
 			// player events if playing
@@ -921,6 +941,20 @@ void Update(RenderWindow& window) {
 			}
 		}
 
+		// mouse pressed events ----------------------------------------------
+		if (event.type == sf::Event::MouseButtonPressed)
+		{
+			if (event.mouseButton.button == sf::Mouse::Left) {
+
+				// determine if ingame or main menu
+				if (currState == GameState::playing) {
+
+					// if ingame projectile launch
+					player->projectilePressed();
+				}
+			}
+		}
+		// mouse released events ----------------------------------------------
 		if (event.type == sf::Event::MouseButtonReleased)
 		{
 			if (event.mouseButton.button == sf::Mouse::Left) {
@@ -961,6 +995,7 @@ void Update(RenderWindow& window) {
 
 	// send info to hud
 	hud->JumpX(player->getJcharge());
+	hud->SpellX(player->getScharge());
 
 	// check walls for collision ===========================================================================================================================
 	for (auto s = begin(tiles); s != end(tiles); ++s) {
@@ -1072,6 +1107,13 @@ void Update(RenderWindow& window) {
 					player->setPosition({ pBounds.left, wBounds.top + wBounds.height + 5 });
 				}
 			}
+		}
+
+		// check player agains collectible
+		sf::Vector2f pCentre = { pBounds.left + (pBounds.width * 0.5f), pBounds.top + (pBounds.height * 0.5f) };
+		if (pickup->getGlobalBounds().contains(pCentre)) {
+			pickup->setActive(false);
+			hud->CollectableGained();
 		}
 	}
 	//=======================================================================================================================================================

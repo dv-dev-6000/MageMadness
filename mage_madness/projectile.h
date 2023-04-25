@@ -7,6 +7,7 @@ class Projectile : public Entity {
 protected:
 
     bool _isActive;
+    bool _isBouncy;
     int _hp;
     sf::Vector2f _dest;
 

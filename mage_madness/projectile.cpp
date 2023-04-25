@@ -13,6 +13,7 @@ Projectile::Projectile() : Entity() {
 
 	_dest = {0,0};
 	_isActive = false;
+	_isBouncy = false;
 	_hp = 0;
 	_angleShot = 0;
 	_angleShot2 = 0;
@@ -23,14 +24,22 @@ Projectile::Projectile() : Entity() {
 void Projectile::Update(const float& dt) {
 
 	if (getState()) {
-		if (_hp == 2) {
+
+		if (_isBouncy) {
+			if (_hp == 2) {
+				move({ (cos(_angleShot) * _speed) * dt, 0 });
+				move({ 0, (sin(_angleShot) * _speed) * dt });
+			}
+			else {
+				move({ (cos(_angleShot2) * _speed) * dt, 0 });
+				move({ 0, (sin(_angleShot2) * _speed) * dt });
+			}
+		}
+		else {
 			move({ (cos(_angleShot) * _speed) * dt, 0 });
 			move({ 0, (sin(_angleShot) * _speed) * dt });
 		}
-		else {
-			move({ (cos(_angleShot2) * _speed) * dt, 0 });
-			move({ 0, (sin(_angleShot2) * _speed) * dt });
-		}
+		
 	}
 
 	Entity::Update(dt);
@@ -40,7 +49,7 @@ void Projectile::Update(const float& dt) {
 void Projectile::fireMe(sf::Vector2f startPos, sf::Vector2f destination, int hp, float speed) {
 
 	_isActive = true;
-	_hp = 2;
+	_hp = hp;
 	setColor(Color::Cyan);
 	setPosition(startPos);
 	_dest = destination;
@@ -48,6 +57,13 @@ void Projectile::fireMe(sf::Vector2f startPos, sf::Vector2f destination, int hp,
 
 	_angleShot = atan2(destination.y - getPosition().y, destination.x - getPosition().x);
 	_angleShot2 = -_angleShot;
+
+	if (hp > 1) {
+		_isBouncy = true;
+	}
+	else {
+		_isBouncy = false;
+	}
 }
 
 bool Projectile::getState() {

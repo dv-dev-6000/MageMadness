@@ -22,6 +22,7 @@ extern sf::Texture buttonTex;
 
 extern sf::Texture hudBaseTex;
 extern sf::Texture hudOverTex;
+extern sf::Texture pickupTex;
 
 extern sf::Font pixFont;
 
