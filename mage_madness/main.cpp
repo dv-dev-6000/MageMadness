@@ -252,6 +252,12 @@ void clickButton(RenderWindow& window) {
 	}
 }
 
+void KillPlayer() {
+	player->setPosition({ initialPlayerPosition });
+	player->resetVelocity(0, 0);
+	hud->AddFail();
+}
+
 // Initialise ===========================================================================================================
 
 /// <summary>
@@ -1077,14 +1083,16 @@ void Update(RenderWindow& window) {
 			float wallTop = wBounds.top;
 			float wallBottom = wBounds.top + wBounds.height;
 
-			// if spiked then kill else collide
 			if ((*s)->getType() == 4 || (*s)->getType() == 8) {
-				player->setPosition({ initialPlayerPosition });
-				player->resetVelocity(0, 0);
-				hud->AddFail();
+				// if spiked then kill 
+				KillPlayer();
+			}
+			else if (((*s)->getType() == 2) && (!(*s)->getColliding()) && (colBottom == wallBottom && collision.value().width > collision.value().height)) {
+				// if crushed by grav block then kill 
+				KillPlayer();
 			}
 			else {
-
+				// else collide
 				if (colTop == wallTop && collision.value().width > collision.value().height) // players feet
 				{
 					player->resetVelocity(player->getVelX(), 0);
@@ -1109,7 +1117,7 @@ void Update(RenderWindow& window) {
 			}
 		}
 
-		// check player agains collectible
+		// check player against collectible
 		sf::Vector2f pCentre = { pBounds.left + (pBounds.width * 0.5f), pBounds.top + (pBounds.height * 0.5f) };
 		if (pickup->getGlobalBounds().contains(pCentre)) {
 			pickup->setActive(false);
