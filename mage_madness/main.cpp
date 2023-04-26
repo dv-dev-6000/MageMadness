@@ -54,10 +54,12 @@ EntityManager menuButtonManager;
 
 std::vector<shared_ptr<Tile>> tiles;
 std::vector<shared_ptr<Projectile>> projectiles;
+//std::vector<shared_ptr<EnemyTurret>> turrets;
+std::shared_ptr<EnemyTurret> t1;
+std::shared_ptr<EnemyTurret> t2;
 std::vector<shared_ptr<Button>> buttons;
 std::shared_ptr<Player> player;
 std::shared_ptr<PickUp> pickup;
-std::shared_ptr<EnemyTurret> enemyTurret;		// ** to do - if adding more turrets then they will need to be stored in a vector like projectiles
 std::shared_ptr<EnemySpikey> enemySpikey;
 std::shared_ptr<TeleProjectile> tp;
 std::shared_ptr<HUD> hud;
@@ -106,7 +108,6 @@ sf::Sprite cursor;
 
 // Player/enemies position values
 Vector2f playerPosition(100, 100);
-Vector2f enemTurPosition(1250, 350);
 Vector2f enemSpikPosition(250,350);
 
 
@@ -258,6 +259,24 @@ void KillPlayer() {
 	hud->AddFail();
 }
 
+void TurretShoot(std::shared_ptr<EnemyTurret> turret) {
+
+	if (turret->Shoot()) {
+
+		// iterate through projectile pool, excluding element zero (reserved for player)
+		for (auto it = 1; it < projectiles.size(); it++) {
+
+			// find an inactive projectile in pool
+			if (!projectiles[it]->getState()) {
+
+				projectiles[it]->fireMe(turret->getPosition(), player->getPosition(), 1, 300);
+				break;
+			}
+		}
+	}
+
+}
+
 // Initialise ===========================================================================================================
 
 /// <summary>
@@ -331,7 +350,7 @@ void Load() {
 	if (!whiteBallTex.loadFromFile("res/img/WhiteBall.png")) {
 		cerr << "Failed to load spritesheet!" << std::endl;
 	}
-	// load projectile textures
+	// load button textures
 	if (!buttonTex.loadFromFile("res/img/Button.png")) {
 		cerr << "Failed to load spritesheet!" << std::endl;
 	}
@@ -402,8 +421,6 @@ void Reload() {
 	tp = std::make_shared<TeleProjectile>();
 	entityManager.list.push_back(tp);
 
-	// Load turret enemy
-	enemyTurret = make_shared<EnemyTurret>(player);
 	// Load enemy spikey
 	enemySpikey = make_shared<EnemySpikey>(player);
 
@@ -499,9 +516,15 @@ void Reload() {
 			// set player values
 			//player->setTexture(playerTex);
 			player->setPosition({ 100, 100 });
-			// Set enemy turret values
-			enemyTurret->setTexture(enemyTurTex);
-			enemyTurret->setPosition({ 1250, 350 });
+			
+			// Set enemy turret1 values
+			t1 = std::make_shared<EnemyTurret>(player, sf::Vector2f{ 1250, 350 });
+			entityManager.list.push_back(t1);
+
+			// Set enemy turret2 values
+			t2 = std::make_shared<EnemyTurret>(player, sf::Vector2f{ 900, 350 });
+			entityManager.list.push_back(t2);
+
 			// Set enemy spikey values
 			enemySpikey->setTexture(enemySpikeyTex);
 			enemySpikey->setPosition({ 250,350 });
@@ -544,8 +567,7 @@ void Reload() {
 			player->setTexture(playerTex);
 			player->setPosition({ initialPlayerPosition});
 			// Set enemy turret values
-			enemyTurret->setTexture(enemyTurTex);
-			enemyTurret->setPosition({ 1000, 700 });
+			
 			// Set enemy spikey values
 			enemySpikey->setTexture(enemySpikeyTex);
 			enemySpikey->setPosition({ 600,150 });
@@ -573,8 +595,7 @@ void Reload() {
 			player->setTexture(playerTex);
 			player->setPosition({ initialPlayerPosition });
 			// Set enemy turret values
-			enemyTurret->setTexture(enemyTurTex);
-			enemyTurret->setPosition({ 1000,500 });
+			
 			// Set enemy spikey values
 			enemySpikey->setTexture(enemySpikeyTex);
 			enemySpikey->setPosition({ 150, 600 });
@@ -601,8 +622,7 @@ void Reload() {
 			player->setTexture(playerTex);
 			player->setPosition({ initialPlayerPosition });
 			// Set enemy turret values
-			enemyTurret->setTexture(enemyTurTex);
-			enemyTurret->setPosition({ 850,650 });
+			
 			// Set enemy spikey values
 			enemySpikey->setTexture(enemySpikeyTex);
 			enemySpikey->setPosition({ 150, 600 });
@@ -629,8 +649,7 @@ void Reload() {
 			player->setTexture(playerTex);
 			player->setPosition({ initialPlayerPosition });
 			// Set enemy turret values
-			enemyTurret->setTexture(enemyTurTex);
-			enemyTurret->setPosition({ 250,250 });
+			
 			// Set enemy spikey values
 			enemySpikey->setTexture(enemySpikeyTex);
 			enemySpikey->setPosition({ 150, 600 });
@@ -657,8 +676,7 @@ void Reload() {
 			player->setTexture(playerTex);
 			player->setPosition({ initialPlayerPosition });
 			// Set enemy turret values
-			enemyTurret->setTexture(enemyTurTex);
-			enemyTurret->setPosition({ 1000,550 });
+			
 			// Set enemy spikey values
 			enemySpikey->setTexture(enemySpikeyTex);
 			enemySpikey->setPosition({ 150, 600 });
@@ -685,8 +703,7 @@ void Reload() {
 			player->setTexture(playerTex);
 			player->setPosition({ initialPlayerPosition });
 			// Set enemy turret values
-			enemyTurret->setTexture(enemyTurTex);
-			enemyTurret->setPosition({ 1100,450 });
+			
 			// Set enemy spikey values
 			enemySpikey->setTexture(enemySpikeyTex);
 			enemySpikey->setPosition({ 150, 600 });
@@ -712,8 +729,7 @@ void Reload() {
 			player->setTexture(playerTex);
 			player->setPosition({ initialPlayerPosition });
 			// Set enemy turret values
-			enemyTurret->setTexture(enemyTurTex);
-			enemyTurret->setPosition({ 400,500 });
+			
 			// Set enemy spikey values
 			enemySpikey->setTexture(enemySpikeyTex);
 			enemySpikey->setPosition({ 150, 600 });
@@ -740,8 +756,7 @@ void Reload() {
 			player->setTexture(playerTex);
 			player->setPosition({ initialPlayerPosition });
 			// Set enemy turret values
-			enemyTurret->setTexture(enemyTurTex);
-			enemyTurret->setPosition({ 300,650 });
+			
 			// Set enemy spikey values
 			enemySpikey->setTexture(enemySpikeyTex);
 			enemySpikey->setPosition({ 150, 600 });
@@ -751,8 +766,7 @@ void Reload() {
 			break;
 	}
 
-	// add enemies
-	entityManager.list.push_back(enemyTurret);
+	// Spikey enemy
 	entityManager.list.push_back(enemySpikey);
 }
 
@@ -1126,20 +1140,12 @@ void Update(RenderWindow& window) {
 	}
 	//=======================================================================================================================================================
 
-	// check if turrets can shoot		*** once multiple turrets supported this shoudld cycle through a list of all turrets
-	if (enemyTurret->Shoot()) {
-
-		// iterate through projectile pool, excluding element zero (reserved for player)
-		for (auto it = 1; it < projectiles.size(); it++) {
-
-			// find an inactive projectile in pool
-			if (!projectiles[it]->getState()) {
-
-				projectiles[it]->fireMe(enemyTurret->getPosition(), player->getPosition(), 1, 300);
-				break;
-			}
-		}
+	// check if turrets can shoot
+	if (currState != GameState::menu) {
+		TurretShoot(t1);
+		TurretShoot(t2);
 	}
+	
 }
 
 //===========================================================================================================================================================
