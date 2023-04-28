@@ -6,17 +6,20 @@
 using namespace sf;
 using namespace std;
 
-EnemyTurret::EnemyTurret(std::shared_ptr<Player>& player) : Entity()
+EnemyTurret::EnemyTurret(std::shared_ptr<Player>& player, sf::Vector2f turPos) : Entity()
 {
 	setTextureRect(IntRect(Vector2(0, 0), Vector2(58, 64)));
 	setTexture(enemyTurTex);
 
+	_turPos = turPos;
 	_player = player;
 	_difference = {0,0};
 	_distance = 0;
 	_attackRange = 500;
 	_timer = 3;
 	_shoot = false;
+
+	setPosition(turPos);
 }
 
 bool EnemyTurret::Shoot() {

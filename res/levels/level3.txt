@@ -2,10 +2,10 @@ aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
 a          g   g      b     ea
 a          g   g    aaaaaaaaaa
 a  aaaaabaabaaabaaaaaaaaaaaaaa
-a                            a
+a                   uu       a
 a                       aaaa a
 aaaaaaaaaaabaaaba      aaaaaba
-a a                   aaaaqa a
+a auuuuu    uuu       aaaaqa a
 a a        g    b   saaaaaqa a
 a g        b        aaaaaaqa a
 a b     a          aaqqqqqqa a

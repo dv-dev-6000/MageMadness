@@ -5,7 +5,7 @@ a   asaaaaas   bbbbbbb     saa
 aa  aa     aaaa      b     aaa
 a  aa          bbbbbbb       a
 aaa         ggaaaaaaaaaaaaggga
-a   aaaaaaaabb            bbba
+a   aaaaaaaabb     uuuuuuubbba
 a   a  g   g                 a
 a   b  b   g    aa           a
 a   a      g                 a

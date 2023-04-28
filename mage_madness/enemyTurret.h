@@ -8,6 +8,7 @@ class EnemyTurret : public Entity
 protected:
     std::shared_ptr<Player> _player;
     sf::Vector2f _difference;
+    sf::Vector2f _turPos;
     float _distance;
     float _attackRange;
     float _timer;
@@ -16,7 +17,7 @@ protected:
 public:
 
     //Constructor
-    EnemyTurret(std::shared_ptr<Player>& player);
+    EnemyTurret(std::shared_ptr<Player>& player, sf::Vector2f turPos);
 
     void Update(const float& dt) override;
     bool Shoot();
