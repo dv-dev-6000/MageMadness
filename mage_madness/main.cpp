@@ -78,6 +78,9 @@ int moveX;
 int moveY;
 const int cursorSpeed = 1000;
 
+// sometimes you need to break;
+bool needToBreak;
+
 // get desktop resolution info
 VideoMode desktop = VideoMode::getDesktopMode();
 // create view object (used to scale content with window size and adjust aspect ratio) 
@@ -225,10 +228,10 @@ void MoveCursor(float dt) {
 void ClickOne(RenderWindow& window) {
 
 	if (player->getScharge() < 995) {
-		projectiles[0]->fireMe(player->getPosition(), cursor.getPosition(), 1, 500);
+		projectiles[0]->fireMe(player->getPosition(), cursor.getPosition(), 1, 500, false);
 	}
 	else {
-		projectiles[0]->fireMe(player->getPosition(), cursor.getPosition(), 2, 500);
+		projectiles[0]->fireMe(player->getPosition(), cursor.getPosition(), 2, 500, false);
 	}
 	player->projectileReleased();
 }
@@ -236,7 +239,7 @@ void ClickOne(RenderWindow& window) {
 // right click or controller left shoulder
 void ClickTwo(RenderWindow& window) {
 
-	tp->fireMe(player->getPosition(), cursor.getPosition(), 1, 500);
+	tp->fireMe(player->getPosition(), cursor.getPosition(), 1, 500, false);
 }
 
 void clickButton(RenderWindow& window) {
@@ -277,7 +280,7 @@ void TurretShoot(std::shared_ptr<EnemyTurret> turret) {
 			// find an inactive projectile in pool
 			if (!projectiles[it]->getState()) {
 
-				projectiles[it]->fireMe(turret->getPosition(), player->getPosition(), 1, 300);
+				projectiles[it]->fireMe(turret->getPosition(), player->getPosition(), 1, 300, true);
 				break;
 			}
 		}
@@ -352,6 +355,7 @@ void Init() {
 	howToPlayOpen = false;
 	moveX = false;
 	moveY = false;
+	needToBreak = false;
 }
 
 // Load Content =========================================================================================================
@@ -1055,9 +1059,11 @@ void Update(RenderWindow& window) {
 
 			// get projectile bounds
 			sf::FloatRect projBounds = (*it)->getGlobalBounds();
-			// get collision data
+			// get projectile centre
+			sf::Vector2f projCentre = { projBounds.getPosition().x + (projBounds.width / 2),projBounds.getPosition().y + (projBounds.height / 2) };
+			
+			// get collision data against wall
 			optional collision = wBounds.findIntersection(projBounds);
-
 			if ((*it)->getState() && collision) {
 
 				// if breakblock then move offscreen
@@ -1069,6 +1075,18 @@ void Update(RenderWindow& window) {
 				// trigger collision effect
 				(*it)->collision(dt, colRect, wBounds, 1);
 			}
+
+			// check against player
+			if (player->getGlobalBounds().contains(projCentre) && (*it)->getHostile()) {
+				KillPlayer();
+				needToBreak = true;
+				break;
+			}
+		}
+
+		if (needToBreak) {
+			needToBreak = false;
+			break;
 		}
 
 		// check gravblocks --------------------------------------------------------------------------------------------------------------------------------

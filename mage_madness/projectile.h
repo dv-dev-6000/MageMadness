@@ -8,6 +8,7 @@ protected:
 
     bool _isActive;
     bool _isBouncy;
+    bool _isHostile;
     int _hp;
     sf::Vector2f _dest;
 
@@ -25,8 +26,9 @@ public:
     virtual void Update(const float& dt) override;
     virtual void Render(sf::RenderWindow& window) override;
 
-    void fireMe(sf::Vector2f startPos, sf::Vector2f destination, int hp, float speed);
+    void fireMe(sf::Vector2f startPos, sf::Vector2f destination, int hp, float speed, bool hostile);
     bool getState();
+    bool getHostile();
     virtual void collision(const float& dt, sf::FloatRect collision, sf::FloatRect wall, int dmg);
 };
 

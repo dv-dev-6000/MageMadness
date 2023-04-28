@@ -15,6 +15,7 @@ Projectile::Projectile() : Entity() {
 	_dest = {0,0};
 	_isActive = false;
 	_isBouncy = false;
+	_isHostile = false;
 	_hp = 0;
 	_angleShot = 0;
 	_angleShot2 = 0;
@@ -47,9 +48,10 @@ void Projectile::Update(const float& dt) {
 }
 
 
-void Projectile::fireMe(sf::Vector2f startPos, sf::Vector2f destination, int hp, float speed) {
+void Projectile::fireMe(sf::Vector2f startPos, sf::Vector2f destination, int hp, float speed, bool hostile) {
 
 	_isActive = true;
+	_isHostile = hostile;
 	_hp = hp;
 	setPosition(startPos);
 	_dest = destination;
@@ -70,8 +72,13 @@ bool Projectile::getState() {
 	return _isActive;
 }
 
+bool Projectile::getHostile() {
+	return _isHostile;
+}
+
 void  Projectile::resetProjectile() {
 	_isActive = false;
+	_isHostile = false;
 	_dest = { 0,0 };
 	_angleShot = 0;
 	_angleShot2 = 0;
