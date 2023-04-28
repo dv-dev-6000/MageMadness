@@ -25,6 +25,8 @@ public:
 
     // methods misc.
     void AddFail();
+    void SetFail(int val);
+    int getFail();
     void CollectableGained();
     void JumpX(float val);
     void SpellX(float val);

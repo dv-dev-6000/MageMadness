@@ -44,6 +44,16 @@ void HUD::AddFail() {
 	_failText.setString(_failCountAsText);
 }
 
+void HUD::SetFail(int val) {
+	_failCount = val;
+	_failCountAsText = std::to_string(_failCount);
+	_failText.setString(_failCountAsText);
+}
+
+int HUD::getFail() {
+	return _failCount;
+}
+
 void HUD::CollectableGained() {
 	_gotCollectable = true;
 	setTexture(hudOverTex);

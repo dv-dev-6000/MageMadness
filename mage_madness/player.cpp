@@ -24,7 +24,7 @@ Player::Player() : Entity() {
     _speed = 200;
     _velocityX = 0;
     _velocityY = 0;
-    _gravity = 9;
+    _gravity = 8;
 
     _isAirborn = false;
     _jumpPressed = false;

@@ -254,9 +254,17 @@ void clickButton(RenderWindow& window) {
 }
 
 void KillPlayer() {
-	player->setPosition({ initialPlayerPosition });
-	player->resetVelocity(0, 0);
+	// increment fail count
 	hud->AddFail();
+	// save current fail count
+	int tmp = hud->getFail();
+	// reload level
+	Reload();
+	// update fail count with saved count
+	hud->SetFail(tmp);
+	// set tp count when enabled
+
+	
 }
 
 void TurretShoot(std::shared_ptr<EnemyTurret> turret) {
@@ -275,6 +283,58 @@ void TurretShoot(std::shared_ptr<EnemyTurret> turret) {
 		}
 	}
 
+}
+
+void PickupCollected() {
+	// deactivate collectable object
+	pickup->setActive(false);
+	// update HUD
+	hud->CollectableGained();
+	// Find exit block and activate
+	for (auto it = begin(tiles); it != end(tiles); ++it) {
+		
+		if ((*it)->getType() == 5) {
+			(*it)->setEndActive(true);
+			break;
+		}
+	}
+}
+
+void NextLevel() {
+	if (currScene == GameScene::mainMenu) {
+		currScene = GameScene::tutorial_1;
+	}
+	else if (currScene == GameScene::tutorial_1) {
+		currScene = GameScene::tutorial_2;
+	}
+	else if (currScene == GameScene::tutorial_2) {
+		currScene = GameScene::tutorial_3;
+	}
+	else if (currScene == GameScene::tutorial_3) {
+		currScene = GameScene::level_1;
+	}
+	else if (currScene == GameScene::level_1) {
+		currScene = GameScene::level_2;
+	}
+	else if (currScene == GameScene::level_2) {
+		currScene = GameScene::level_3;
+	}
+	else if (currScene == GameScene::level_3) {
+		currScene = GameScene::level_4;
+	}
+	else if (currScene == GameScene::level_4) {
+		currScene = GameScene::level_5;
+	}
+	else if (currScene == GameScene::level_5) {
+		currScene = GameScene::boss_level_1;
+	}
+	else if (currScene == GameScene::boss_level_1) {
+		currScene = GameScene::boss_level_2;
+	}
+	else if (currScene == GameScene::boss_level_2) {
+		currScene = GameScene::boss_level_3;
+	}
+	Reload();
 }
 
 // Initialise ===========================================================================================================
@@ -918,40 +978,7 @@ void Update(RenderWindow& window) {
 				// TESTING SCENE SKIP
 				if (event.key.code == Keyboard::Right) {
 
-					if (currScene == GameScene::mainMenu) {
-						currScene = GameScene::tutorial_1;
-					}
-					else if(currScene == GameScene::tutorial_1) {
-						currScene = GameScene::tutorial_2;
-					}
-					else if (currScene == GameScene::tutorial_2) {
-						currScene = GameScene::tutorial_3;
-					}
-					else if (currScene == GameScene::tutorial_3) {
-						currScene = GameScene::level_1;
-					}
-					else if (currScene == GameScene::level_1) {
-						currScene = GameScene::level_2;
-					}
-					else if (currScene == GameScene::level_2) {
-						currScene = GameScene::level_3;
-					}
-					else if (currScene == GameScene::level_3) {
-						currScene = GameScene::level_4;
-					}
-					else if (currScene == GameScene::level_4) {
-						currScene = GameScene::level_5;
-					}
-					else if (currScene == GameScene::level_5) {
-						currScene = GameScene::boss_level_1;
-					}
-					else if (currScene == GameScene::boss_level_1) {
-						currScene = GameScene::boss_level_2;
-					}
-					else if (currScene == GameScene::boss_level_2) {
-						currScene = GameScene::boss_level_3;
-					}
-					Reload();
+					NextLevel();
 				}
 			}
 
@@ -1100,10 +1127,17 @@ void Update(RenderWindow& window) {
 			if ((*s)->getType() == 4 || (*s)->getType() == 8) {
 				// if spiked then kill 
 				KillPlayer();
+				break;
 			}
 			else if (((*s)->getType() == 2) && (!(*s)->getColliding()) && (colBottom == wallBottom && collision.value().width > collision.value().height)) {
 				// if crushed by grav block then kill 
 				KillPlayer();
+				break;
+			}
+			else if ((*s)->getType() == 5 && (*s)->getEndActive()) {
+				// check for end block 
+				NextLevel();
+				break;
 			}
 			else {
 				// else collide
@@ -1134,8 +1168,7 @@ void Update(RenderWindow& window) {
 		// check player against collectible
 		sf::Vector2f pCentre = { pBounds.left + (pBounds.width * 0.5f), pBounds.top + (pBounds.height * 0.5f) };
 		if (pickup->getGlobalBounds().contains(pCentre)) {
-			pickup->setActive(false);
-			hud->CollectableGained();
+			PickupCollected();
 		}
 	}
 	//=======================================================================================================================================================

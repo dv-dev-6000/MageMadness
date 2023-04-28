@@ -7,6 +7,7 @@ protected:
 
     int _type;
     bool _gBlockColliding;
+    bool _endBlockActive;
 
 public:
     //Constructor that takes a sprite
@@ -18,4 +19,6 @@ public:
     int getType();
     bool getColliding();
     void setColliding(bool value);
+    bool getEndActive();
+    void setEndActive(bool value);
 };

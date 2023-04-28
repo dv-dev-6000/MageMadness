@@ -9,6 +9,7 @@ Tile::Tile(int type, sf::Vector2f pos) : Entity() {
 
 	_type = type;
 	_gBlockColliding = false;
+	_endBlockActive = false;
 
 	switch (type) {
 
@@ -35,6 +36,7 @@ Tile::Tile(int type, sf::Vector2f pos) : Entity() {
 		case 5:
 			// if end
 			setTexture(endBlockTileTex); // UPDATE TEXTURE
+			setColor(sf::Color(255,255,255,100));
 			break;
 
 		case 6:
@@ -78,6 +80,18 @@ bool Tile::getColliding() {
 
 void Tile::setColliding(bool value) {
 	_gBlockColliding = value;
+}
+
+bool Tile::getEndActive() {
+	return _endBlockActive;
+}
+
+void Tile::setEndActive(bool value) {
+	_endBlockActive = value;
+
+	if (_endBlockActive) {
+		setColor(sf::Color(255, 255, 255, 255));
+	}
 }
 
 void Tile::Render(sf::RenderWindow& window)
