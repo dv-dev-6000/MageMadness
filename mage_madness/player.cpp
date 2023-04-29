@@ -24,7 +24,7 @@ Player::Player() : Entity() {
     _speed = 200;
     _velocityX = 0;
     _velocityY = 0;
-    _gravity = 8;
+    _gravity = 750;
 
     _isAirborn = false;
     _jumpPressed = false;
@@ -94,7 +94,7 @@ void Player::Update(const float& dt) {
         }
     }
 
-    _velocityY += _gravity;
+    _velocityY += _gravity * dt;
 
     Entity::Update(dt);
 }
