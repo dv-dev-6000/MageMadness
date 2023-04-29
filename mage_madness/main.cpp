@@ -89,6 +89,7 @@ sf::View view;
 // Pixel Font
 Font pixFont;
 Text titleText;
+Text debugText;
 
 // textures 
 sf::Texture tileTex, breakTileTex, gravTileTex, spikeTileTex, bossBlockTileTex, area1BlockTileTex, endBlockTileTex, upDownSpikesTex;
@@ -444,6 +445,7 @@ void Load() {
 
 	pixFont.loadFromFile("res/fonts/PressStart2P-Regular.ttf");
 	titleText.setFont(pixFont);
+	debugText.setFont(pixFont);
 
 	cursor.setTexture(cursorTex);
 
@@ -462,6 +464,7 @@ void Reload() {
 	menuButtonManager.list.clear();
 	buttons.clear();
 	titleText.setString(" ");
+	debugText.setString(" ");
 
 	// re-populate lists -------------------------------------------------
 
@@ -560,6 +563,12 @@ void Reload() {
 			break;
 
 		case GameScene::tutorial_1:
+
+			// DEBUG TEXT
+			titleText.setCharacterSize(50);
+			titleText.setPosition({ 100, 150 });
+			debugText.setCharacterSize(50);
+			debugText.setPosition({ 100, 350 });
 
 			// tut 1 logic here
 			currState = GameState::playing;
@@ -1044,6 +1053,10 @@ void Update(RenderWindow& window) {
 		menuButtonManager.update(dt);
 	}
 
+	// DEBUG TEXT
+	titleText.setString(std::to_string(player->getPosition().y));
+	debugText.setString(std::to_string(player->_yPosOld));
+
 	// send info to hud
 	hud->JumpX(player->getJcharge());
 	hud->SpellX(player->getScharge());
@@ -1077,11 +1090,11 @@ void Update(RenderWindow& window) {
 			}
 
 			// check against player
-			if (player->getGlobalBounds().contains(projCentre) && (*it)->getHostile()) {
-				KillPlayer();
-				needToBreak = true;
-				break;
-			}
+			//if (player->getGlobalBounds().contains(projCentre) && (*it)->getHostile()) {
+			//	KillPlayer();
+			//	needToBreak = true;
+			//	break;
+			//}
 		}
 
 		if (needToBreak) {
@@ -1219,6 +1232,10 @@ void Render(RenderWindow& window) {
 
 	// draw cursor
 	window.draw(cursor);
+
+	// DEBUG TEXT
+	window.draw(titleText);
+	window.draw(debugText);
 }
 
 int main() {

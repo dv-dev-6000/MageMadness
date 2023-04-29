@@ -10,6 +10,8 @@ protected:
     float _velocityY;
     float _gravity;
 
+    
+
     const float _maxJumpCharge = 1000;
     float _jChargeTime;
     float _jChargeUnit;
@@ -29,6 +31,7 @@ protected:
 
 public:
 
+    int _yPosOld;
     //Constructor
     Player();
 

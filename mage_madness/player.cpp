@@ -37,6 +37,8 @@ Player::Player() : Entity() {
     
     _movingLeft = false;
     _movingRight = false;
+
+    _yPosOld = 0;
 };
 
 void Player::moveLeft() {
@@ -60,6 +62,8 @@ void Player::setMoving(bool left, bool right) {
 }
 
 void Player::Update(const float& dt) {
+
+    _yPosOld = getPosition().y;
 
     //left
     if ((Keyboard::isKeyPressed(keyControls[0]) && conScheme == 1) || (Keyboard::isKeyPressed(keyControlsLefty[0]) && conScheme == 2) || _movingLeft){
@@ -96,6 +100,12 @@ void Player::Update(const float& dt) {
 
     _velocityY += _gravity * dt;
 
+    // check if falling
+    if (_yPosOld != (int)getPosition().y) {
+        _isAirborn = true;
+    }
+    _yPosOld = getPosition().y;
+
     Entity::Update(dt);
 }
 
@@ -124,7 +134,17 @@ void Player::jumpReleased() {
     if (!_isAirborn && _jumpPressed) {
         _isAirborn = true;
         _jumpPressed = false;
-        _velocityY = -_jChargeTime;
+
+        // set miniumu jump height
+        if (_jChargeTime < 300) {
+            // if charge to low use minimum height
+            _velocityY = -300;
+        }
+        else {
+            // else use charged value
+            _velocityY = -_jChargeTime;
+        }
+        
         _jChargeTime = 0;
         setTextureRect(IntRect(Vector2(0, 0), Vector2(45, 64)));
     }
