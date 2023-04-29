@@ -111,6 +111,8 @@ Vector2f playerPosition(100, 100);
 Vector2f enemSpikPosition(250,350);
 
 
+
+
 // Game Methods ===========================================================================================================
 
 // manage window options
@@ -378,6 +380,9 @@ void Load() {
 		cerr << "Failed to load spritesheet!" << std::endl;
 	}
 
+
+
+	// Load font
 	pixFont.loadFromFile("res/fonts/PressStart2P-Regular.ttf");
 	titleText.setFont(pixFont);
 
@@ -527,7 +532,7 @@ void Reload() {
 
 			// Set enemy spikey values
 			enemySpikey->setTexture(enemySpikeyTex);
-			enemySpikey->setPosition({ 250,350 });
+			enemySpikey->setPosition({ 550,350 });
 			// set collectable
 			pickup = std::make_shared<PickUp>(sf::Vector2f{ 400, 100 });
 			entityManager.list.push_back(pickup);

@@ -13,10 +13,13 @@ class EnemySpikey : public Entity
 {
 protected:
     std::shared_ptr<Player> _player;
+    sf::Vector2f _direction;
+    sf::Vector2f _homePos;
+    SpikeyState _currState;
     float _speed;
     float _length;
-    sf::Vector2f _direction;
-    SpikeyState _currState;
+    float _timer;
+    float _range;
 
 public:
 
