@@ -7,6 +7,7 @@ protected:
 
     sf::Text _buttonText;
     bool _selected;
+    bool _isActive;
     int _id;
 
 public:
@@ -17,5 +18,6 @@ public:
     void Update(const float& dt) override;
     void Render(sf::RenderWindow& window) override;
     int isSelected();
+    void setActive(bool);
 
 };

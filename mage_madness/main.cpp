@@ -74,6 +74,9 @@ GameState currState;
 int conScheme; // 1=right, 2=left, 3=controler
 int levelID;
 
+// data from file
+sf::Vector2i fileData;
+
 // menu scenes
 bool optionMenuOpen;
 bool howToPlayOpen;
@@ -150,7 +153,11 @@ void PressButton(int id, RenderWindow& window) {
 			Reload();
 			break;
 		case 2:
-			// load level to start from
+			// continue
+			currScene = static_cast<GameScene>(fileData.x);
+			Reload();
+			hud->SetFail(fileData.y);
+
 			break;
 		case 3:
 			// display how to play panel
@@ -371,6 +378,15 @@ void NextLevel() {
 	Reload();
 }
 
+void LoadData() {
+	// load data
+	if (db.CheckCreateSavesFolder()) {
+		if (db.CheckCreateSaveFile()) {
+			fileData = db.LoadProgress();
+		}
+	}
+}
+
 // Initialise ===========================================================================================================
 
 /// <summary>
@@ -389,6 +405,7 @@ void Init() {
 	needToBreak = false;
 	isPaused = false;
 	levelID = 0;
+	fileData = { 0,0 };
 }
 
 // Load Content =========================================================================================================
@@ -534,6 +551,17 @@ void Reload() {
 	// Load enemy spikey
 	enemySpikey = make_shared<EnemySpikey>(player);
 
+	// Load collectable
+	pickup = std::make_shared<PickUp>(sf::Vector2f{ 0, 0});
+	entityManager.list.push_back(pickup);
+
+	// Load enemy turret1 values
+	t1 = std::make_shared<EnemyTurret>(player, sf::Vector2f{ 0, 0});
+	entityManager.list.push_back(t1);
+	// Load enemy turret2 values
+	t2 = std::make_shared<EnemyTurret>(player, sf::Vector2f{ 0, 0 });
+	entityManager.list.push_back(t2);
+
 	// load pause menu buttons if not main menu
 	if (currScene != GameScene::mainMenu) {
 		// load button back to main menu
@@ -554,8 +582,10 @@ void Reload() {
 
 			// set level id for save load
 			levelID = 0;
-
+			// set state
 			currState = GameState::menu;
+			// load in save data
+			LoadData();
 
 			// main menu logic here
 			titleText.setCharacterSize(100);
@@ -573,6 +603,9 @@ void Reload() {
 				std::shared_ptr<Button> but2 = make_shared<Button>("Continue", 40, sf::Vector2f((view.getCenter().x - 224), 450), 2);
 				menuButtonManager.list.push_back(but2);
 				buttons.push_back(but2);
+				if (fileData.x == 0) {
+					but2->setActive(false);
+				}
 
 				std::shared_ptr<Button> but3 = make_shared<Button>("How To Play", 35, sf::Vector2f((view.getCenter().x - 224), 600), 3);
 				menuButtonManager.list.push_back(but3);
@@ -647,23 +680,15 @@ void Reload() {
 			}
 
 			// set player values
-			//player->setTexture(playerTex);
 			player->setPosition({ 100, 100 });
-			
 			// Set enemy turret1 values
-			t1 = std::make_shared<EnemyTurret>(player, sf::Vector2f{ 1250, 350 });
-			entityManager.list.push_back(t1);
-
+			t1->setPosition({ 1250, 350 });
 			// Set enemy turret2 values
-			t2 = std::make_shared<EnemyTurret>(player, sf::Vector2f{ 900, 350 });
-			entityManager.list.push_back(t2);
-
+			t2->setPosition({ 900, 350 });
 			// Set enemy spikey values
-			enemySpikey->setTexture(enemySpikeyTex);
 			enemySpikey->setPosition({ 250,350 });
 			// set collectable
-			pickup = std::make_shared<PickUp>(sf::Vector2f{ 400, 100 });
-			entityManager.list.push_back(pickup);
+			pickup->setPosition({ 400, 100 });
 
 			break;
 
@@ -674,6 +699,7 @@ void Reload() {
 
 			// tut 2 logic here
 			currState = GameState::playing;
+
 			break;
 
 		case GameScene::tutorial_3:
@@ -693,6 +719,7 @@ void Reload() {
 			// level 1 logic here
 			currState = GameState::playing;
 			initialPlayerPosition = { 100, 100 };
+
 			// level load
 			ls::loadLevelFile("res/levels/level1.txt");
 			// add tiles to tile list
@@ -706,13 +733,15 @@ void Reload() {
 			}
 
 			// set player values
-			player->setTexture(playerTex);
-			player->setPosition({ initialPlayerPosition});
-			// Set enemy turret values
-			
+			player->setPosition({ initialPlayerPosition });
+			// Set enemy turret1 values
+			t1->setPosition({ 10250, 350 });		// turrets off screen, add a deactivation for levels without all turrets ** 
+			// Set enemy turret2 values				//
+			t2->setPosition({ 9000, 350 });			//
 			// Set enemy spikey values
-			enemySpikey->setTexture(enemySpikeyTex);
-			enemySpikey->setPosition({ 600,150 });
+			enemySpikey->setPosition({ 150, 600 });
+			// set collectable
+			pickup->setPosition({ 400, 100 });
 
 			break;
 
@@ -724,6 +753,7 @@ void Reload() {
 			// level 2 logic here
 			currState = GameState::playing;
 			initialPlayerPosition = { 1050,140 };
+
 			// level load
 			ls::loadLevelFile("res/levels/level2.txt");
 			// add tiles to tile list
@@ -737,13 +767,15 @@ void Reload() {
 			}
 
 			// set player values
-			player->setTexture(playerTex);
 			player->setPosition({ initialPlayerPosition });
-			// Set enemy turret values
-			
+			// Set enemy turret1 values
+			t1->setPosition({ 10250, 350 });		// turrets off screen, add a deactivation for levels without all turrets ** 
+			// Set enemy turret2 values				//
+			t2->setPosition({ 9000, 350 });			//
 			// Set enemy spikey values
-			enemySpikey->setTexture(enemySpikeyTex);
 			enemySpikey->setPosition({ 150, 600 });
+			// set collectable
+			pickup->setPosition({ 400, 100 });
 
 			break;
 		case GameScene::level_3:
@@ -754,6 +786,7 @@ void Reload() {
 			// level 3 logic here
 			currState = GameState::playing;
 			initialPlayerPosition = { 100, 450 };
+
 			// level load
 			ls::loadLevelFile("res/levels/level3.txt");
 			// add tiles to tile list
@@ -767,13 +800,15 @@ void Reload() {
 			}
 
 			// set player values
-			player->setTexture(playerTex);
 			player->setPosition({ initialPlayerPosition });
-			// Set enemy turret values
-			
+			// Set enemy turret1 values
+			t1->setPosition({ 10250, 350 });		// turrets off screen, add a deactivation for levels without all turrets ** 
+			// Set enemy turret2 values				//
+			t2->setPosition({ 9000, 350 });			//
 			// Set enemy spikey values
-			enemySpikey->setTexture(enemySpikeyTex);
 			enemySpikey->setPosition({ 150, 600 });
+			// set collectable
+			pickup->setPosition({ 400, 100 });
 
 			break;
 		case GameScene::level_4:
@@ -784,6 +819,7 @@ void Reload() {
 			// level 4 logic here
 			currState = GameState::playing;
 			initialPlayerPosition = { 850, 450 };
+
 			// level load
 			ls::loadLevelFile("res/levels/level4.txt");
 			// add tiles to tile list
@@ -797,13 +833,15 @@ void Reload() {
 			}
 
 			// set player values
-			player->setTexture(playerTex);
 			player->setPosition({ initialPlayerPosition });
-			// Set enemy turret values
-			
+			// Set enemy turret1 values
+			t1->setPosition({ 10250, 350 });		// turrets off screen, add a deactivation for levels without all turrets ** 
+			// Set enemy turret2 values				//
+			t2->setPosition({ 9000, 350 });			//
 			// Set enemy spikey values
-			enemySpikey->setTexture(enemySpikeyTex);
 			enemySpikey->setPosition({ 150, 600 });
+			// set collectable
+			pickup->setPosition({ 400, 100 });
 
 			break;
 		case GameScene::level_5:
@@ -814,6 +852,7 @@ void Reload() {
 			// level 5 logic here
 			currState = GameState::playing;
 			initialPlayerPosition = { 100, 100 };
+
 			// level load
 			ls::loadLevelFile("res/levels/level5.txt");
 			// add tiles to tile list
@@ -827,13 +866,15 @@ void Reload() {
 			}
 
 			// set player values
-			player->setTexture(playerTex);
 			player->setPosition({ initialPlayerPosition });
-			// Set enemy turret values
-			
+			// Set enemy turret1 values
+			t1->setPosition({ 10250, 350 });		// turrets off screen, add a deactivation for levels without all turrets ** 
+			// Set enemy turret2 values				//
+			t2->setPosition({ 9000, 350 });			//
 			// Set enemy spikey values
-			enemySpikey->setTexture(enemySpikeyTex);
 			enemySpikey->setPosition({ 150, 600 });
+			// set collectable
+			pickup->setPosition({ 400, 100 });
 
 			break;
 		case GameScene::boss_level_1:
@@ -857,13 +898,16 @@ void Reload() {
 			}
 
 			// set player values
-			player->setTexture(playerTex);
 			player->setPosition({ initialPlayerPosition });
-			// Set enemy turret values
-			
+			// Set enemy turret1 values
+			t1->setPosition({ 10250, 350 });		// turrets off screen, add a deactivation for levels without all turrets ** 
+			// Set enemy turret2 values				//
+			t2->setPosition({ 9000, 350 });			//
 			// Set enemy spikey values
-			enemySpikey->setTexture(enemySpikeyTex);
 			enemySpikey->setPosition({ 150, 600 });
+			// set collectable
+			pickup->setPosition({ 400, 100 });
+
 			break;
 		case GameScene::boss_level_2:
 
@@ -873,6 +917,7 @@ void Reload() {
 			// boss level 2 logic here
 			currState = GameState::playing;
 			initialPlayerPosition = { 700, 150 };
+
 			// level load
 			ls::loadLevelFile("res/levels/bossLevel2.txt");
 			// add tiles to tile list
@@ -886,13 +931,16 @@ void Reload() {
 			}
 
 			// set player values
-			player->setTexture(playerTex);
 			player->setPosition({ initialPlayerPosition });
-			// Set enemy turret values
-			
+			// Set enemy turret1 values
+			t1->setPosition({ 10250, 350 });		// turrets off screen, add a deactivation for levels without all turrets ** 
+			// Set enemy turret2 values				//
+			t2->setPosition({ 9000, 350 });			//
 			// Set enemy spikey values
-			enemySpikey->setTexture(enemySpikeyTex);
 			enemySpikey->setPosition({ 150, 600 });
+			// set collectable
+			pickup->setPosition({ 400, 100 });
+
 			break;
 
 		case GameScene::boss_level_3:
@@ -903,6 +951,7 @@ void Reload() {
 			// boss level 3 logic here
 			currState = GameState::playing;
 			initialPlayerPosition = { 1750, 800 };
+
 			// level load
 			ls::loadLevelFile("res/levels/bossLevel3.txt");
 			// add tiles to tile list
@@ -916,13 +965,16 @@ void Reload() {
 			}
 
 			// set player values
-			player->setTexture(playerTex);
 			player->setPosition({ initialPlayerPosition });
-			// Set enemy turret values
-			
+			// Set enemy turret1 values
+			t1->setPosition({ 10250, 350 });		// turrets off screen, add a deactivation for levels without all turrets ** 
+			// Set enemy turret2 values				//
+			t2->setPosition({ 9000, 350 });			//
 			// Set enemy spikey values
-			enemySpikey->setTexture(enemySpikeyTex);
 			enemySpikey->setPosition({ 150, 600 });
+			// set collectable
+			pickup->setPosition({ 400, 100 });
+
 			break;
 
 		default:
