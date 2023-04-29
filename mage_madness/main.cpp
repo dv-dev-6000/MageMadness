@@ -11,6 +11,7 @@
 #include "button.h"
 #include "hud.h"
 #include "pickup.h"
+#include "data.h"
 
 using namespace sf;
 using namespace std;
@@ -48,6 +49,9 @@ enum class GameState {
 	menu,
 };
 
+// Save/Load
+Data db;
+
 // entities & lists  
 EntityManager entityManager;
 EntityManager menuButtonManager;
@@ -68,10 +72,12 @@ std::shared_ptr<HUD> hud;
 GameScene currScene;
 GameState currState;
 int conScheme; // 1=right, 2=left, 3=controler
+int levelID;
 
 // menu scenes
 bool optionMenuOpen;
 bool howToPlayOpen;
+bool isPaused;
 
 // cursor move with controller
 int moveX;
@@ -95,6 +101,7 @@ Text debugText;
 sf::Texture tileTex, breakTileTex, gravTileTex, spikeTileTex, bossBlockTileTex, area1BlockTileTex, endBlockTileTex, upDownSpikesTex;
 sf::Texture optionsBackdrop, howToBackdrop, howToBackdropLefty, howToBackdropController;
 sf::Texture hudBaseTex, hudOverTex;
+sf::Texture pauseTex;
 sf::Texture cursorTex;
 sf::Texture whiteBallTex;
 sf::Texture playerTex;
@@ -213,6 +220,29 @@ void PressButton(int id, RenderWindow& window) {
 			optionMenuOpen = false;
 			howToPlayOpen = false;
 			Reload();
+			break;
+		case 12:
+			// save and quit to menu
+			if (db.CheckCreateSavesFolder()) {
+				if (db.CheckCreateSaveFile()) {
+					db.UpdateSave(levelID, hud->getFail());
+				}
+			}
+
+			optionMenuOpen = false;
+			howToPlayOpen = false;
+			isPaused = false;
+			currScene = GameScene::mainMenu;
+			Reload();
+			break;
+		case 13:
+			// resume
+			isPaused = false;
+			currState = GameState::playing;
+			break;
+		case 14:
+			// close game 
+			window.close();
 			break;
 		default:
 			break;
@@ -357,6 +387,8 @@ void Init() {
 	moveX = false;
 	moveY = false;
 	needToBreak = false;
+	isPaused = false;
+	levelID = 0;
 }
 
 // Load Content =========================================================================================================
@@ -401,6 +433,9 @@ void Load() {
 		cerr << "Failed to load spritesheet!" << std::endl;
 	}
 	if (!howToBackdropController.loadFromFile("res/img/howtoMM_Controller.png")) {
+		cerr << "Failed to load spritesheet!" << std::endl;
+	}
+	if (!pauseTex.loadFromFile("res/img/pause.png")) {
 		cerr << "Failed to load spritesheet!" << std::endl;
 	}
 	if (!cursorTex.loadFromFile("res/img/Cursor.png")) {
@@ -468,6 +503,14 @@ void Reload() {
 
 	// re-populate lists -------------------------------------------------
 
+	// DEBUG TEXT
+	//db.CheckCreateSavesFolder();
+	//db.CheckCreateSaveFile();
+	//db.UpdateSave(1,2);
+	//debugText.setCharacterSize(50);
+	//debugText.setString(std::to_string(db.LoadProgress().y));
+	//debugText.setPosition({ (view.getSize().x * .5f) - (debugText.getLocalBounds().width * .5f), 10 });
+
 	// load hud
 	hud = std::make_shared<HUD>();
 	entityManager.list.push_back(hud);
@@ -491,37 +534,57 @@ void Reload() {
 	// Load enemy spikey
 	enemySpikey = make_shared<EnemySpikey>(player);
 
+	// load pause menu buttons if not main menu
+	if (currScene != GameScene::mainMenu) {
+		// load button back to main menu
+		std::shared_ptr<Button> b1 = make_shared<Button>("Save and Quit", 30, sf::Vector2f((view.getCenter().x - 224), 600), 12);
+		menuButtonManager.list.push_back(b1);
+		buttons.push_back(b1);
+		// load button resume
+		std::shared_ptr<Button> b2 = make_shared<Button>("Resume", 40, sf::Vector2f((view.getCenter().x - 224), 800), 13);
+		menuButtonManager.list.push_back(b2);
+		buttons.push_back(b2);
+	}
+
+
 	// level logic -------------------------------------------------------
 	switch (currScene) {
 
 		case GameScene::mainMenu:
+
+			// set level id for save load
+			levelID = 0;
 
 			currState = GameState::menu;
 
 			// main menu logic here
 			titleText.setCharacterSize(100);
 			titleText.setString("Mage Madness");
-			titleText.setPosition({ (view.getSize().x * .5f) - (titleText.getLocalBounds().width * .5f), 150 });
-			
+			titleText.setPosition({ (view.getSize().x * .5f) - (titleText.getLocalBounds().width * .5f), 120 });
+
 			// add buttons
 			if (!optionMenuOpen && !howToPlayOpen) {
 				
 				// load buttons main menu
-				std::shared_ptr<Button> but1 = make_shared<Button>("New Game", 40, sf::Vector2f((view.getCenter().x - 224), 400), 1);
+				std::shared_ptr<Button> but1 = make_shared<Button>("New Game", 40, sf::Vector2f((view.getCenter().x - 224), 300), 1);
 				menuButtonManager.list.push_back(but1);
 				buttons.push_back(but1);
 
-				std::shared_ptr<Button> but2 = make_shared<Button>("Continue", 40, sf::Vector2f((view.getCenter().x - 224), 550), 2);
+				std::shared_ptr<Button> but2 = make_shared<Button>("Continue", 40, sf::Vector2f((view.getCenter().x - 224), 450), 2);
 				menuButtonManager.list.push_back(but2);
 				buttons.push_back(but2);
 
-				std::shared_ptr<Button> but3 = make_shared<Button>("How To Play", 35, sf::Vector2f((view.getCenter().x - 224), 700), 3);
+				std::shared_ptr<Button> but3 = make_shared<Button>("How To Play", 35, sf::Vector2f((view.getCenter().x - 224), 600), 3);
 				menuButtonManager.list.push_back(but3);
 				buttons.push_back(but3);
 
-				std::shared_ptr<Button> but4 = make_shared<Button>("Options", 40, sf::Vector2f((view.getCenter().x - 224), 850), 4);
+				std::shared_ptr<Button> but4 = make_shared<Button>("Options", 40, sf::Vector2f((view.getCenter().x - 224), 750), 4);
 				menuButtonManager.list.push_back(but4);
 				buttons.push_back(but4);
+
+				std::shared_ptr<Button> butClose = make_shared<Button>("Exit", 40, sf::Vector2f((view.getCenter().x - 224), 900), 14);
+				menuButtonManager.list.push_back(butClose);
+				buttons.push_back(butClose);
 			}
 			else if (optionMenuOpen) {
 				// load buttons option menu
@@ -564,11 +627,8 @@ void Reload() {
 
 		case GameScene::tutorial_1:
 
-			// DEBUG TEXT
-			titleText.setCharacterSize(50);
-			titleText.setPosition({ 100, 150 });
-			debugText.setCharacterSize(50);
-			debugText.setPosition({ 100, 350 });
+			// set level id for save load
+			levelID = 1;
 
 			// tut 1 logic here
 			currState = GameState::playing;
@@ -609,17 +669,26 @@ void Reload() {
 
 		case GameScene::tutorial_2:
 
+			// set level id for save load
+			levelID = 2;
+
 			// tut 2 logic here
 			currState = GameState::playing;
 			break;
 
 		case GameScene::tutorial_3:
 
+			// set level id for save load
+			levelID = 3;
+
 			// tut 3 logic here
 			currState = GameState::playing;
 			break;
 
 		case GameScene::level_1:
+
+			// set level id for save load
+			levelID = 4;
 
 			// level 1 logic here
 			currState = GameState::playing;
@@ -649,6 +718,9 @@ void Reload() {
 
 		case GameScene::level_2:
 
+			// set level id for save load
+			levelID = 5;
+
 			// level 2 logic here
 			currState = GameState::playing;
 			initialPlayerPosition = { 1050,140 };
@@ -675,6 +747,9 @@ void Reload() {
 
 			break;
 		case GameScene::level_3:
+
+			// set level id for save load
+			levelID = 6;
 
 			// level 3 logic here
 			currState = GameState::playing;
@@ -703,6 +778,9 @@ void Reload() {
 			break;
 		case GameScene::level_4:
 
+			// set level id for save load
+			levelID = 7;
+
 			// level 4 logic here
 			currState = GameState::playing;
 			initialPlayerPosition = { 850, 450 };
@@ -729,6 +807,9 @@ void Reload() {
 
 			break;
 		case GameScene::level_5:
+
+			// set level id for save load
+			levelID = 8;
 
 			// level 5 logic here
 			currState = GameState::playing;
@@ -757,6 +838,9 @@ void Reload() {
 			break;
 		case GameScene::boss_level_1:
 
+			// set level id for save load
+			levelID = 9;
+
 			// boss level 1 logic here
 			currState = GameState::playing;
 			initialPlayerPosition = { 100, 250 };
@@ -782,6 +866,9 @@ void Reload() {
 			enemySpikey->setPosition({ 150, 600 });
 			break;
 		case GameScene::boss_level_2:
+
+			// set level id for save load
+			levelID = 10;
 
 			// boss level 2 logic here
 			currState = GameState::playing;
@@ -809,6 +896,9 @@ void Reload() {
 			break;
 
 		case GameScene::boss_level_3:
+
+			// set level id for save load
+			levelID = 11;
 
 			// boss level 3 logic here
 			currState = GameState::playing;
@@ -855,11 +945,13 @@ void Update(RenderWindow& window) {
 	// get mouse position
 	sf::Vector2f mousePosition = window.mapPixelToCoords(sf::Mouse::getPosition(window));
 
-	// update cursor (mouse & keyboard settings only)
+	// update cursor
 	if (conScheme != 3) {
+		// keyboard & mouse
 		cursor.setPosition(mousePosition);
 	}
 	else {
+		// controller
 		MoveCursor(dt);
 	}
 
@@ -875,8 +967,11 @@ void Update(RenderWindow& window) {
 		// joy V = rSh		|	povX = Select					//
 		// joy U = lSh		|	povY = Start					//
 		//======================================================//
+		
+		// joystick moved
 		if (event.type == sf::Event::JoystickMoved) {
-			if (event.joystickMove.axis == Joystick::Axis::X) {
+			// move player if in game
+			if (event.joystickMove.axis == Joystick::Axis::X && currState == GameState::playing) {
 				
 				if (event.joystickMove.position > 30) {
 					// move right
@@ -892,6 +987,7 @@ void Update(RenderWindow& window) {
 				}
 				
 			}
+			// move cursor x axis
 			if (event.joystickMove.axis == Joystick::Axis::U) {
 
 				if (event.joystickMove.position > 30) {
@@ -907,6 +1003,7 @@ void Update(RenderWindow& window) {
 				}
 
 			}
+			// move cursor y axis
 			if (event.joystickMove.axis == Joystick::Axis::V) {
 
 				if (event.joystickMove.position > 30) {
@@ -922,6 +1019,7 @@ void Update(RenderWindow& window) {
 				}
 			}
 		}
+		// controller button pressed
 		if (event.type == sf::Event::JoystickButtonPressed) {
 			if (event.joystickButton.button == Joystick::X) {
 				
@@ -938,24 +1036,24 @@ void Update(RenderWindow& window) {
 				}
 				
 			}
-			if (event.joystickButton.button == Joystick::V) {
+			if (event.joystickButton.button == Joystick::V && currState == GameState::playing) {
 				player->projectilePressed();
 			}
 		}
+		// controller button released
 		if (event.type == sf::Event::JoystickButtonReleased) {
-			if (event.joystickButton.button == Joystick::X) {
+			if (event.joystickButton.button == Joystick::X && currState == GameState::playing) {
 				player->jumpReleased();
 			}
-			if (event.joystickButton.button == Joystick::V) {
+			if (event.joystickButton.button == Joystick::V && currState == GameState::playing) {
 				ClickOne(window);
 			}
-			if (event.joystickButton.button == Joystick::U) {
+			if (event.joystickButton.button == Joystick::U && currState == GameState::playing) {
 				ClickTwo(window);
 			}
 		}
 		
-
-		// key pressed events ---------------------------------------------
+		// key pressed events ------------------------------------
 		if (event.type == sf::Event::KeyPressed)
 		{
 			// player events if playing
@@ -969,14 +1067,23 @@ void Update(RenderWindow& window) {
 				}
 			}
 
+			// pause game
+			if ((event.key.code == Keyboard::Escape || event.key.code == Keyboard::P) && currScene!=GameScene::mainMenu) {
 
-			if (event.key.code == Keyboard::Escape) {
-
-				window.close();
+				if (currState == GameState::playing) {
+					currState = GameState::menu;
+					isPaused = true;
+					menuBackdropSprite.setTexture(pauseTex);
+				}
+				else {
+					currState = GameState::playing;
+					isPaused = false;
+				}
+				//window.close();
 			}
 		}
 
-		// key released events ----------------------------------------------
+		// key released events -----------------------------------
 		if (event.type == sf::Event::KeyReleased)
 		{
 			// player events if playing
@@ -995,13 +1102,14 @@ void Update(RenderWindow& window) {
 				}
 			}
 
+			// revert to default controls (right handed keyboard and mouse)
 			if (event.key.code == Keyboard::Equal){
 
 				conScheme = 1;
 			}
 		}
 
-		// mouse pressed events ----------------------------------------------
+		// mouse pressed events ----------------------------------
 		if (event.type == sf::Event::MouseButtonPressed)
 		{
 			if (event.mouseButton.button == sf::Mouse::Left) {
@@ -1014,7 +1122,8 @@ void Update(RenderWindow& window) {
 				}
 			}
 		}
-		// mouse released events ----------------------------------------------
+
+		// mouse released events ---------------------------------
 		if (event.type == sf::Event::MouseButtonReleased)
 		{
 			if (event.mouseButton.button == sf::Mouse::Left) {
@@ -1031,7 +1140,7 @@ void Update(RenderWindow& window) {
 					clickButton(window);
 				}
 			}
-			if (event.mouseButton.button == sf::Mouse::Right) {
+			if (event.mouseButton.button == sf::Mouse::Right && currState == GameState::playing) {
 
 				// TP launch
 				ClickTwo(window);
@@ -1046,16 +1155,12 @@ void Update(RenderWindow& window) {
 	//------------------------------------------------------------------------------------------------------------------------------------------------------
 
 	// update entities
-	if (currScene != GameScene::mainMenu) {
+	if (currState == GameState::playing) {
 		entityManager.update(dt);
 	}
 	else {
 		menuButtonManager.update(dt);
 	}
-
-	// DEBUG TEXT
-	titleText.setString(std::to_string(player->getPosition().y));
-	debugText.setString(std::to_string(player->_yPosOld));
 
 	// send info to hud
 	hud->JumpX(player->getJcharge());
@@ -1090,11 +1195,11 @@ void Update(RenderWindow& window) {
 			}
 
 			// check against player
-			//if (player->getGlobalBounds().contains(projCentre) && (*it)->getHostile()) {
-			//	KillPlayer();
-			//	needToBreak = true;
-			//	break;
-			//}
+			if (player->getGlobalBounds().contains(projCentre) && (*it)->getHostile()) {
+				KillPlayer();
+				needToBreak = true;
+				break;
+			}
 		}
 
 		if (needToBreak) {
@@ -1136,7 +1241,6 @@ void Update(RenderWindow& window) {
 
 			tp->collision(dt, colRect, wBounds, player);
 		}
-
 
 		//check player collision ----------------------------------------------------------------------------------------------------------------------------
 		sf::FloatRect pBounds = player->getGlobalBounds();
@@ -1205,7 +1309,7 @@ void Update(RenderWindow& window) {
 	//=======================================================================================================================================================
 
 	// check if turrets can shoot
-	if (currState != GameState::menu) {
+	if (currState == GameState::playing) {
 		TurretShoot(t1);
 		TurretShoot(t2);
 	}
@@ -1217,24 +1321,30 @@ void Update(RenderWindow& window) {
 //___________________________________________________________________________________________________________________________________________________________
 void Render(RenderWindow& window) {
 	// Draw Everything
-	if (currScene == GameScene::mainMenu) {
-		window.draw(titleText);
-		if (optionMenuOpen || howToPlayOpen) { 
-			window.draw(menuBackdropSprite);
-		}
-		menuButtonManager.render(window);
+	if (currState == GameState::playing) {
+
+		entityManager.render(window);
 		Renderer::render();
 	}
-	else {
-		entityManager.render(window);
+	else if (currState == GameState::menu) {
+		
+		// draw backdrop behind content
+		if (optionMenuOpen || howToPlayOpen || isPaused) {
+			window.draw(menuBackdropSprite);
+		}
+		else {
+			// draw title if main menu
+			window.draw(titleText);
+		}
+		// send buttons to render queue
+		menuButtonManager.render(window);
+		// render content
 		Renderer::render();
 	}
 
 	// draw cursor
 	window.draw(cursor);
-
 	// DEBUG TEXT
-	window.draw(titleText);
 	window.draw(debugText);
 }
 
