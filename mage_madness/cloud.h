@@ -2,6 +2,7 @@
 #pragma once
 #include <SFML/Graphics.hpp>
 #include <SFML/Audio.hpp>
+#include <SFML/Audio/Music.hpp>
 
 // constant vatiables
 constexpr uint16_t hdGameWidth = 1920;
@@ -35,6 +36,9 @@ extern sf::Texture enemySpikeyTex;
 extern int conScheme;
 // cursor
 extern sf::Sprite cursor;
+
+// Sound
+extern sf::Music BGmusic;
 
 
 

@@ -1,4 +1,5 @@
 #include <SFML/Graphics.hpp>
+#include <SFML/Audio.hpp>
 #include <iostream>
 #include "cloud.h"
 #include "LevelSystem.h"
@@ -111,6 +112,8 @@ Vector2f playerPosition(100, 100);
 Vector2f enemSpikPosition(250,350);
 
 
+// Sound
+//sf::Music BGmusic;
 
 
 // Game Methods ===========================================================================================================
@@ -381,6 +384,11 @@ void Load() {
 	}
 
 
+	// Load sound
+	/*if (!BGmusic.openFromFile("res/audio/BG.wav"))
+	{
+		cerr << "Failed to load bg music!" << std::endl;
+	}*/
 
 	// Load font
 	pixFont.loadFromFile("res/fonts/PressStart2P-Regular.ttf");
@@ -886,6 +894,27 @@ void Update(RenderWindow& window) {
 			}
 		}
 		
+		// Use P to take a screenshot
+		//if (event.key.code == Keyboard::P)
+		//{
+		//	// Create a texture from current window
+		//	sf::Texture texture;
+		//	texture.create(window.getSize());
+		//	texture.update(window);
+
+		//	// Copy contents of the texture into an image
+		//	sf::Image screenshot = texture.copyToImage();
+
+		//	// Save image to a file
+		//	if (screenshot.saveToFile("res/img/screenshot.png"))
+		//	{
+		//		std::cout << "Screenshot saved" << std::endl;
+		//	}
+		//	else
+		//	{
+		//		std::cout << "Failed to save screenshot" << std::endl;
+		//	}
+		}
 
 		// key pressed events ---------------------------------------------
 		if (event.type == sf::Event::KeyPressed)
@@ -1191,6 +1220,7 @@ int main() {
 
 	Init();
 	Load();
+	/*BGmusic.play();*/
 
 	while (window.isOpen()) {
 		window.clear();

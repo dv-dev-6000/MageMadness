@@ -17,61 +17,78 @@ EnemySpikey::EnemySpikey(std::shared_ptr<Player> &player) : Entity()
 	setTextureRect(IntRect(Vector2(0, 0), Vector2(46, 47)));
 	setTexture(enemySpikeyTex);
 	
+	// Waypoints
+	_waypoint1 = Vector2f(100, 100);
+	_waypoint2 = Vector2f(100, 500);
+	/*_waypoint3 = Vector2f(100, 100);
+	_waypoint4 = Vector2f(100, 100);
+	_waypoint5 = Vector2f(100, 100);*/
+
 	_length = 0;
 	_speed = 50;
-	_timer = 4;
-	_direction = Vector2f(2.0f, 0.0f);
-	_range = 450;
+	_timer = 10;
+	_direction = Vector2f();
+	_range = 50;
 	_homePos = getPosition();
 	_player = player;
 
 
 	_currState = SpikeyState::Patrolling;
 
-	
+
 }
 
 void EnemySpikey::Update(const float& dt)
 {
-	
-	// Calculate direction from enemy to player
-	_direction = _player->getPosition() - getPosition();
-	_length = sqrt(_direction.x * _direction.x + _direction.y * _direction.y);
+
+
 
 	switch (_currState)
 	{
+
 		case SpikeyState::Patrolling:	// if the state is set patrolling, the entity will move side to side on the spot for a few seconds before travelling again
 		{
 			// Decrease the timer
 			_timer -= 1 * dt;
-			
-			if (_timer > 0)
+			_movement = _direction * _speed * dt;
+			move(_movement);
+
+			// Right side
+			if (_timer > 0 && getPosition().x > -100.f)
 			{
-				move(_direction * _speed * dt);
+				_direction = sf::Vector2f(-1.0f, 0.0f);
+			}
+			// Left side
+			if (_timer > 0 && getPosition().x < 150.f)
+			{
+				_direction = sf::Vector2f(1.0f, 0.0f);
 			}
 
-			/* if (_length <= _range)
-			{
-				_currState = SpikeyState::Following;
-				std::cout << _length << std::endl;
-			}
-			else
+			// Travel to next waypoint if time is 0
+			if (_timer == 0)
 			{
 				_currState = SpikeyState::Travelling;
-			}*/
+			}
 		}
 			break;
 			
 		case SpikeyState::Travelling:   // if the state is set travelling, the entity will choose a random point on the map and travel there, when at destination change to patrolling
+			
+			
+				
+				
+				
+			
 
-			// select point within bounds of level					** to do
-
-			// use same logic from following to move to point		** to do
-
+			
+			
 			break;
 
 		case SpikeyState::Following:	// if the state is set follow, the entity will follow the player (follow triggers when )
-
+			
+			// Calculate direction from enemy to player
+			_direction = _player->getPosition() - getPosition();
+			_length = sqrt(_direction.x * _direction.x + _direction.y * _direction.y);
 			// If length not 0 then divide direction/length and move enemy towards player
 			if (_length != 0.0f)
 			{
