@@ -665,7 +665,7 @@ void Reload() {
 
 			// tut 1 logic here
 			currState = GameState::playing;
-			initialPlayerPosition = { 100, 100 };
+			initialPlayerPosition = { 128, 640 };
 
 			// level load
 			ls::loadLevelFile("res/levels/tutOne.txt");
@@ -680,15 +680,15 @@ void Reload() {
 			}
 
 			// set player values
-			player->setPosition({ 100, 100 });
+			player->setPosition(initialPlayerPosition);
 			// Set enemy turret1 values
-			t1->setPosition({ 1250, 350 });
+			t1->setPosition({ 100250, 350 });
 			// Set enemy turret2 values
-			t2->setPosition({ 900, 350 });
+			t2->setPosition({ 90000, 350 });
 			// Set enemy spikey values
 			enemySpikey->setPosition({ 250,350 });
 			// set collectable
-			pickup->setPosition({ 400, 100 });
+			pickup->setPosition({ 1792, 448});
 
 			break;
 
@@ -699,6 +699,31 @@ void Reload() {
 
 			// tut 2 logic here
 			currState = GameState::playing;
+			initialPlayerPosition = { 128, 640 };
+
+			// level load
+			ls::loadLevelFile("res/levels/tutTwo.txt");
+			// add tiles to tile list
+			for (int i = 0; i < ls::_sprites.size(); i++) {
+
+				tileInfo currTile = ls::_sprites[i];
+
+				std::shared_ptr<Tile> tile = std::make_shared<Tile>(currTile.type, currTile.pos);
+				tiles.push_back(tile);
+				entityManager.list.push_back(tile);
+			}
+
+			// set player values
+			player->setPosition(initialPlayerPosition);
+			// Set enemy turret1 values
+			t1->setPosition({ 100250, 350 });
+			// Set enemy turret2 values
+			t2->setPosition({ 90000, 350 });
+			// Set enemy spikey values
+			enemySpikey->setPosition({ 250,350 });
+			// set collectable
+			pickup->setPosition({ 768, 448 });
+
 
 			break;
 
@@ -709,6 +734,31 @@ void Reload() {
 
 			// tut 3 logic here
 			currState = GameState::playing;
+			initialPlayerPosition = { 128, 640 };
+
+			// level load
+			ls::loadLevelFile("res/levels/tutThree.txt");
+			// add tiles to tile list
+			for (int i = 0; i < ls::_sprites.size(); i++) {
+
+				tileInfo currTile = ls::_sprites[i];
+
+				std::shared_ptr<Tile> tile = std::make_shared<Tile>(currTile.type, currTile.pos);
+				tiles.push_back(tile);
+				entityManager.list.push_back(tile);
+			}
+
+			// set player values
+			player->setPosition(initialPlayerPosition);
+			// Set enemy turret1 values
+			t1->setPosition({ 1088, 704 });
+			// Set enemy turret2 values
+			t2->setPosition({ 90000, 350 });
+			// Set enemy spikey values
+			enemySpikey->setPosition({ 250,350 });
+			// set collectable
+			pickup->setPosition({ 768, 448 });
+
 			break;
 
 		case GameScene::level_1:
