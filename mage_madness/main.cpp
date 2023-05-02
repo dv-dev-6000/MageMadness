@@ -1227,6 +1227,19 @@ void Update(RenderWindow& window) {
 				else {
 					currState = GameState::playing;
 					isPaused = false;
+
+					if (currScene == GameScene::tutorial_1) {
+						menuBackdropSprite.setTexture(tut1Backdrop);
+					}
+					else if (currScene == GameScene::tutorial_2) {
+						menuBackdropSprite.setTexture(tut2Backdrop);
+					}
+					else if (currScene == GameScene::tutorial_3) {
+						menuBackdropSprite.setTexture(tut3Backdrop);
+					}
+					else {
+						menuBackdropSprite.setTexture(mainBackdrop);
+					}
 				}
 				//window.close();
 			}
