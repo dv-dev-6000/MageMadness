@@ -31,7 +31,7 @@ Player::Player() : Entity() {
     _spellPressed = false;
 
     _jChargeTime = 0;
-    _jChargeUnit = 700;
+    _jChargeUnit = 1000;
     _sChargeTime = 0;
     _sChargeUnit = 1400;
     
