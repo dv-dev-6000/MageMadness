@@ -13,6 +13,7 @@ protected:
     float _attackRange;
     float _timer;
     bool _shoot;
+    bool _isActive;
 
 public:
 
@@ -23,4 +24,6 @@ public:
     bool Shoot();
     void Render(sf::RenderWindow& window) override;
 
+    bool getActive();
+    void setActive(bool value);
 };

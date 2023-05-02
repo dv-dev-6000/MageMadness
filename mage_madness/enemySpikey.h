@@ -22,7 +22,10 @@ protected:
     sf::Vector2f _distance;
     SpikeyState _currState;
     sf::Vector2f _randomPos;
+    sf::Vector2f _patrolPos;
     float _range;
+
+    bool _isActive;
 
 public:
 
@@ -33,5 +36,8 @@ public:
     void Render(sf::RenderWindow& window) override;
 
     sf::Vector2f generateNewPoint();
+
+    bool getActive();
+    void setActive(bool value);
 
 };

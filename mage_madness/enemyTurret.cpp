@@ -19,6 +19,8 @@ EnemyTurret::EnemyTurret(std::shared_ptr<Player>& player, sf::Vector2f turPos) :
 	_timer = 3;
 	_shoot = false;
 
+	_isActive = true;
+
 	setPosition(turPos);
 }
 
@@ -35,29 +37,43 @@ bool EnemyTurret::Shoot() {
 
 void EnemyTurret::Update(const float& dt)
 {
-	// reduce timer
-	_timer -= 1 * dt;
+	if (_isActive) {
+		
+		// reduce timer
+		_timer -= 1 * dt;
 
-	// if timer reaches zero
-	if (_timer <= 0) {
+		// if timer reaches zero
+		if (_timer <= 0) {
 
-		// Calculate the distance between the player and turret
-		_difference = _player->getPosition() - getPosition();
-		_distance = sqrt(pow(_difference.x, 2) + pow(_difference.y, 2));
+			// Calculate the distance between the player and turret
+			_difference = _player->getPosition() - getPosition();
+			_distance = sqrt(pow(_difference.x, 2) + pow(_difference.y, 2));
 
-		// if player is in turrets firing range
-		if (_distance <= _attackRange)
-		{
-			_shoot = true;
+			// if player is in turrets firing range
+			if (_distance <= _attackRange)
+			{
+				_shoot = true;
+			}
+
+			_timer = 3;
 		}
-
-		_timer = 3;
 	}
+	
 
 	Entity::Update(dt);
 }
 
+bool EnemyTurret::getActive() {
+	return _isActive;
+}
+
+void EnemyTurret::setActive(bool value) {
+	_isActive = value;
+}
+
 void EnemyTurret::Render(sf::RenderWindow& window)
 {
-	Renderer::queue(this);
+	if (_isActive) {
+		Renderer::queue(this);
+	}
 }

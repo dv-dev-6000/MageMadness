@@ -261,6 +261,13 @@ void PressButton(int id, RenderWindow& window) {
 			// close game 
 			window.close();
 			break;
+		case 15:
+			optionMenuOpen = false;
+			howToPlayOpen = false;
+			isPaused = false;
+			currScene = GameScene::mainMenu;
+			Reload();
+			break;
 		default:
 			break;
 	}
@@ -669,13 +676,17 @@ void Reload() {
 	if (currScene != GameScene::mainMenu) {
 
 		// load button back to main menu
-		std::shared_ptr<Button> b1 = make_shared<Button>("Save and Quit", 30, sf::Vector2f((view.getCenter().x - 224), 600), 12);
+		std::shared_ptr<Button> b1 = make_shared<Button>("Save and Quit", 30, sf::Vector2f((view.getCenter().x - 224), 500), 12);
 		menuButtonManager.list.push_back(b1);
 		buttons.push_back(b1);
 		// load button resume
 		std::shared_ptr<Button> b2 = make_shared<Button>("Resume", 40, sf::Vector2f((view.getCenter().x - 224), 800), 13);
 		menuButtonManager.list.push_back(b2);
 		buttons.push_back(b2);
+		// load button resume
+		std::shared_ptr<Button> b3 = make_shared<Button>("Quit", 40, sf::Vector2f((view.getCenter().x - 224), 650), 15);
+		menuButtonManager.list.push_back(b3);
+		buttons.push_back(b3);
 	}
 
 

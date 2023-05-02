@@ -7,17 +7,12 @@
 using namespace sf;
 using namespace std;
 
-// IDEAS -------------------------------------------------------------
-//
-// * if time permits we could detect when the spikey collides with tiles and make it semi transparent while moving through objects
-// 
-//--------------------------------------------------------------------
-
 EnemySpikey::EnemySpikey(std::shared_ptr<Player> &player) : Entity()
 {
 	setTextureRect(IntRect(Vector2(0, 0), Vector2(46, 47)));
 	setTexture(enemySpikeyTex);
-	
+	_isActive = true;
+
 	_distW = 0;
 	_length = 0;
 	_l = 0;
@@ -27,6 +22,8 @@ EnemySpikey::EnemySpikey(std::shared_ptr<Player> &player) : Entity()
 	_currState = SpikeyState::Travelling; // starting state - change to patrolling later
 
 	_randomPos = generateNewPoint();
+	_patrolPos = { _randomPos.x + 80, _randomPos.y };
+
 }
 
 sf::Vector2f EnemySpikey::generateNewPoint() {
@@ -38,7 +35,7 @@ sf::Vector2f EnemySpikey::generateNewPoint() {
 	uniform_real_distribution<float> yAxis(64, 880);
 
 	// Random position
-	Vector2f _randomPos(xAxis(_gen), yAxis(_gen));
+	sf::Vector2f _randomPos(xAxis(_gen), yAxis(_gen));
 
 	return _randomPos;
 }
@@ -46,78 +43,120 @@ sf::Vector2f EnemySpikey::generateNewPoint() {
 void EnemySpikey::Update(const float& dt)
 {
 
-	switch (_currState)
-	{
-		case SpikeyState::Patrolling:	// if the state is set patrolling, the entity will move side to side on the spot for a few seconds before travelling again
+	if (_isActive) {
 
-			// decrease timer by 1*dt																		** to do
-
-			// set curr position as "homePosition"															** to do
-			// set target location 30px left of homePosition												** to do
-
-			// if timer is > 0 then move towards target location											** to do
-			// else timer is zero change to travelling then reset timer										** to do
-
-			// if entity reaches target destination move target destination 30px right of home position		** to do
-
-			break;
+		switch (_currState){
 			
-		case SpikeyState::Travelling:   // if the state is set travelling, the entity will choose a random point on the map and travel there, when at destination change to patrolling
-		{
-			// Calculate direction from waypoint to player
-			_direction = _randomPos - getPosition();
-			_distW = sqrt(_direction.x * _direction.x + _direction.y * _direction.y);
+			case SpikeyState::Patrolling:	// if the state is set patrolling, the entity will move side to side on the spot for a few seconds before travelling again
 
-			// If distance to waypoint is above 0.1 travel to it. 
-			// If distance is less than 0.1 then create next random waypoint
-			// Therefore, travel there
-			if (_distW > 0.1f)
-			{
-				_direction /= _distW;
+				// Calculate direction from waypoint to player
+				_direction = _patrolPos - getPosition();
+				_distW = sqrt(_direction.x * _direction.x + _direction.y * _direction.y);
+
+				// If distance to waypoint is above 0.1 travel to it. 
+				// Therefore, travel there
+				if (_distW > 5.0f)
+				{
+					_direction /= _distW;
+					move(_direction * _speed * dt);
+				}
+				else
+				{
+					if (_patrolPos == _randomPos) {
+						_randomPos = generateNewPoint();
+						_patrolPos = { _randomPos.x + 80, _randomPos.y };
+						_currState = SpikeyState::Travelling;
+						setColor(sf::Color::White);
+					}
+					else if (_patrolPos.x > _randomPos.x) {
+						_patrolPos = { _randomPos.x - 80, _randomPos.y };
+					}
+					else {
+						_patrolPos = _randomPos;
+					}
+				}
+
+				_distance = _player->getPosition() - getPosition();
+				_l = sqrt(_distance.x * _distance.x + _distance.y * _distance.y);
+				// If player is in close range, change current state to following
+				if (_l <= _range)
+				{
+					_currState = SpikeyState::Following;
+					setColor(sf::Color::Cyan);
+				}
+
+				break;
+
+			case SpikeyState::Travelling:   // if the state is set travelling, the entity will choose a random point on the map and travel there, when at destination change to patrolling
+		
+				// Calculate direction from waypoint to player
+				_direction = _randomPos - getPosition();
+				_distW = sqrt(_direction.x * _direction.x + _direction.y * _direction.y);
+
+				// If distance to waypoint is above 0.1 travel to it. 
+				// If distance is less than 0.1 then create next random waypoint
+				// Therefore, travel there
+				if (_distW > 5.0f)
+				{
+					_direction /= _distW;
+					move(_direction * _speed * dt);
+				}
+				else
+				{
+					// if target reached go to patrolling
+					_currState = SpikeyState::Patrolling;
+					setColor(sf::Color::Red);
+					//_randomPos = generateNewPoint();
+				}
+
+
+				_distance = _player->getPosition() - getPosition();
+				_l = sqrt(_distance.x * _distance.x + _distance.y * _distance.y);
+				// If player is in close range, change current state to following
+				if (_l <= _range)
+				{
+					_currState = SpikeyState::Following;
+					setColor(sf::Color::Cyan);
+				}
+		
+				break;
+
+			case SpikeyState::Following:	// if the state is set follow, the entity will follow the player (follow triggers when )
+		
+				// Calculate direction from enemy to player
+				_direction = _player->getPosition() - getPosition();
+				_length = sqrt(_direction.x * _direction.x + _direction.y * _direction.y);
+
+				// If length not 0 then divide direction/length and move enemy towards player
+				if (_length != 0.0f)
+				{
+					_direction /= _length;
+				}
+				// Move enemy spikey
 				move(_direction * _speed * dt);
-			}
-			else
-			{
-				_randomPos = generateNewPoint();
-			}
-			
+		
+				break;
 
-			_distance = _player->getPosition() - getPosition();
-			_l = sqrt(_distance.x * _distance.x + _distance.y * _distance.y);
-			// If player is in close range, change current state to following
-			if (_l <= _range)
-			{
-				_currState = SpikeyState::Following;
-				setColor(sf::Color::Cyan);
-			}
+			default:
+				break;
 		}
-			break;
 
-		case SpikeyState::Following:	// if the state is set follow, the entity will follow the player (follow triggers when )
-		{
-			// Calculate direction from enemy to player
-			_direction = _player->getPosition() - getPosition();
-			_length = sqrt(_direction.x * _direction.x + _direction.y * _direction.y);
-
-			// If length not 0 then divide direction/length and move enemy towards player
-			if (_length != 0.0f)
-			{
-				_direction /= _length;
-			}
-			// Move enemy spikey
-			move(_direction * _speed * dt);
-		}
-			break;
-
-		default:
-			break;
 	}
-	
 
 	Entity::Update(dt);
 }
 
+bool EnemySpikey::getActive() {
+	return _isActive;
+}
+
+void EnemySpikey::setActive(bool value) {
+	_isActive = value;
+}
+
 void EnemySpikey::Render(sf::RenderWindow& window)
 {
-	Renderer::queue(this);
+	if (_isActive) {
+		Renderer::queue(this);
+	}
 }
