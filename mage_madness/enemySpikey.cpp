@@ -23,7 +23,7 @@ EnemySpikey::EnemySpikey(std::shared_ptr<Player> &player) : Entity()
 	_l = 0;
 	_speed = 50;
 	_player = player;
-	_range = 100;
+	_range = 400;
 	_currState = SpikeyState::Travelling; // starting state - change to patrolling later
 
 	_randomPos = generateNewPoint();
@@ -34,8 +34,8 @@ sf::Vector2f EnemySpikey::generateNewPoint() {
 	random_device _rd;
 	mt19937 _gen(_rd());
 	// Produce random x and y position accodring to screen width/height
-	uniform_real_distribution<float> xAxis(30, 1900);
-	uniform_real_distribution<float> yAxis(30, 1050);
+	uniform_real_distribution<float> xAxis(64, 1820);
+	uniform_real_distribution<float> yAxis(64, 880);
 
 	// Random position
 	Vector2f _randomPos(xAxis(_gen), yAxis(_gen));
