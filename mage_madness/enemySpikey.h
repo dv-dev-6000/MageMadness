@@ -18,6 +18,7 @@ protected:
     float _length;
     sf::Vector2f _direction;
     SpikeyState _currState;
+    sf::Vector2f _randomPos;
     float _range;
 
 public:
@@ -27,5 +28,7 @@ public:
 
     void Update(const float& dt) override;
     void Render(sf::RenderWindow& window) override;
+
+    sf::Vector2f generateNewPoint();
 
 };

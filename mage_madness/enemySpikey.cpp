@@ -20,10 +20,25 @@ EnemySpikey::EnemySpikey(std::shared_ptr<Player> &player) : Entity()
 	
 	_length = 0;
 	_speed = 50;
-	_range = 20;
 	_player = player;
-
+	_range = 20;
 	_currState = SpikeyState::Travelling; // starting state - change to patrolling later
+
+	_randomPos = generateNewPoint();
+}
+
+sf::Vector2f EnemySpikey::generateNewPoint() {
+	// Generate random numbers
+	random_device _rd;
+	mt19937 _gen(_rd());
+	// Produce random x and y position accodring to screen width/height
+	uniform_real_distribution<float> xAxis(30, 1900);
+	uniform_real_distribution<float> yAxis(30, 1050);
+
+	// Random position
+	Vector2f _randomPos(xAxis(_gen), yAxis(_gen));
+
+	return _randomPos;
 }
 
 void EnemySpikey::Update(const float& dt)
@@ -47,16 +62,6 @@ void EnemySpikey::Update(const float& dt)
 			
 		case SpikeyState::Travelling:   // if the state is set travelling, the entity will choose a random point on the map and travel there, when at destination change to patrolling
 		{
-			// Generate random numbers
-			random_device _rd;
-			mt19937 _gen(_rd());
-			// Produce random x and y position accodring to screen width/height
-			uniform_real_distribution<float> xAxis(30, 1900);
-			uniform_real_distribution<float> yAxis(30, 1050);
-
-			// Random position
-			Vector2f _randomPos(xAxis(_gen), yAxis(_gen));
-
 			// Calculate direction from waypoint to player
 			_direction = _randomPos - getPosition();
 			_length = sqrt(_direction.x * _direction.x + _direction.y * _direction.y);
@@ -71,15 +76,15 @@ void EnemySpikey::Update(const float& dt)
 			}
 			else
 			{
-				_randomPos = Vector2f(xAxis(_gen), yAxis(_gen));
+				_randomPos = generateNewPoint();
 			}
 
 			// If player is in close range, change current state to following
-			if (_length <= _range)
-			{
-				_currState = SpikeyState::Following;
-				setColor(sf::Color::Red);
-			}
+			//if ()
+			//{
+			//	_currState = SpikeyState::Following;
+			//	setColor(sf::Color::Red);
+			//}
 		}
 			break;
 
