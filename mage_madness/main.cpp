@@ -1,4 +1,5 @@
 #include <SFML/Graphics.hpp>
+#include <SFML/Audio.hpp>
 #include <iostream>
 #include "cloud.h"
 #include "LevelSystem.h"
@@ -52,6 +53,11 @@ enum class GameState {
 // Save/Load
 Data db;
 
+// Sound Stuff
+sf::SoundBuffer testSound;
+sf::Sound sound1;
+
+
 // entities & lists  
 EntityManager entityManager;
 EntityManager menuButtonManager;
@@ -103,6 +109,7 @@ Text debugText;
 // textures 
 sf::Texture tileTex, breakTileTex, gravTileTex, spikeTileTex, bossBlockTileTex, area1BlockTileTex, endBlockTileTex, upDownSpikesTex;
 sf::Texture optionsBackdrop, howToBackdrop, howToBackdropLefty, howToBackdropController;
+sf::Texture tut1Backdrop, tut2Backdrop, tut3Backdrop, mainBackdrop;
 sf::Texture hudBaseTex, hudOverTex;
 sf::Texture pauseTex;
 sf::Texture cursorTex;
@@ -458,6 +465,18 @@ void Load() {
 	if (!cursorTex.loadFromFile("res/img/Cursor.png")) {
 		cerr << "Failed to load spritesheet!" << std::endl;
 	}
+	if (!tut1Backdrop.loadFromFile("res/img/tut1back.png")) {
+		cerr << "Failed to load spritesheet!" << std::endl;
+	}
+	if (!tut2Backdrop.loadFromFile("res/img/tut2back.png")) {
+		cerr << "Failed to load spritesheet!" << std::endl;
+	}
+	if (!tut3Backdrop.loadFromFile("res/img/tut3back.png")) {
+		cerr << "Failed to load spritesheet!" << std::endl;
+	}
+	if (!mainBackdrop.loadFromFile("res/img/mainback.png")) {
+		cerr << "Failed to load spritesheet!" << std::endl;
+	}
 
 	// load player textures
 	if (!playerTex.loadFromFile("res/img/PlayerSheet.png")) {
@@ -493,6 +512,12 @@ void Load() {
 	if (!enemySpikeyTex.loadFromFile("res/img/SpikeyFollow.png"))
 	{
 		cerr << "Failed to load spritesheet!" << std::endl;
+	}
+
+	// Loading enemies
+	if (!testSound.loadFromFile("res/audio/test.wav"))
+	{
+		cerr << "Failed to load sfx!" << std::endl;
 	}
 
 	pixFont.loadFromFile("res/fonts/PressStart2P-Regular.ttf");
@@ -663,6 +688,8 @@ void Reload() {
 			// set level id for save load
 			levelID = 1;
 
+			menuBackdropSprite.setTexture(tut1Backdrop);
+
 			// tut 1 logic here
 			currState = GameState::playing;
 			initialPlayerPosition = { 128, 640 };
@@ -696,6 +723,8 @@ void Reload() {
 
 			// set level id for save load
 			levelID = 2;
+
+			menuBackdropSprite.setTexture(tut2Backdrop);
 
 			// tut 2 logic here
 			currState = GameState::playing;
@@ -732,6 +761,8 @@ void Reload() {
 			// set level id for save load
 			levelID = 3;
 
+			menuBackdropSprite.setTexture(tut3Backdrop);
+
 			// tut 3 logic here
 			currState = GameState::playing;
 			initialPlayerPosition = { 128, 640 };
@@ -765,6 +796,8 @@ void Reload() {
 
 			// set level id for save load
 			levelID = 4;
+
+			menuBackdropSprite.setTexture(mainBackdrop);
 
 			// level 1 logic here
 			currState = GameState::playing;
@@ -800,6 +833,8 @@ void Reload() {
 			// set level id for save load
 			levelID = 5;
 
+			menuBackdropSprite.setTexture(mainBackdrop);
+
 			// level 2 logic here
 			currState = GameState::playing;
 			initialPlayerPosition = { 1050,140 };
@@ -832,6 +867,8 @@ void Reload() {
 
 			// set level id for save load
 			levelID = 6;
+
+			menuBackdropSprite.setTexture(mainBackdrop);
 
 			// level 3 logic here
 			currState = GameState::playing;
@@ -866,6 +903,8 @@ void Reload() {
 			// set level id for save load
 			levelID = 7;
 
+			menuBackdropSprite.setTexture(mainBackdrop);
+
 			// level 4 logic here
 			currState = GameState::playing;
 			initialPlayerPosition = { 850, 450 };
@@ -898,6 +937,8 @@ void Reload() {
 
 			// set level id for save load
 			levelID = 8;
+
+			menuBackdropSprite.setTexture(mainBackdrop);
 
 			// level 5 logic here
 			currState = GameState::playing;
@@ -932,6 +973,8 @@ void Reload() {
 			// set level id for save load
 			levelID = 9;
 
+			menuBackdropSprite.setTexture(mainBackdrop);
+
 			// boss level 1 logic here
 			currState = GameState::playing;
 			initialPlayerPosition = { 100, 250 };
@@ -963,6 +1006,8 @@ void Reload() {
 
 			// set level id for save load
 			levelID = 10;
+
+			menuBackdropSprite.setTexture(mainBackdrop);
 
 			// boss level 2 logic here
 			currState = GameState::playing;
@@ -997,6 +1042,8 @@ void Reload() {
 
 			// set level id for save load
 			levelID = 11;
+
+			menuBackdropSprite.setTexture(mainBackdrop);
 
 			// boss level 3 logic here
 			currState = GameState::playing;
@@ -1195,6 +1242,8 @@ void Update(RenderWindow& window) {
 					(event.key.code == Keyboard::RControl && conScheme == 2)){
 
 					player->jumpReleased();
+					sound1.setBuffer(testSound);
+					sound1.play();
 				}
 
 				// TESTING SCENE SKIP
@@ -1425,6 +1474,7 @@ void Render(RenderWindow& window) {
 	// Draw Everything
 	if (currState == GameState::playing) {
 
+		window.draw(menuBackdropSprite);
 		entityManager.render(window);
 		Renderer::render();
 	}

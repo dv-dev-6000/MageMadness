@@ -37,7 +37,7 @@ target_link_libraries(lib_tile_level_loader lib_maths sfml-graphics)
 file(GLOB_RECURSE SOURCES mage_madness/*.cpp mage_madness/*.h)
 add_executable(mage_madness ${SOURCES})
 target_include_directories(mage_madness PRIVATE ${SFML_INCS})
-target_link_libraries(mage_madness lib_tile_level_loader sfml-graphics)
+target_link_libraries(mage_madness lib_tile_level_loader sfml-graphics sfml-audio)
 set_target_properties(mage_madness 
     PROPERTIES VS_DEBUGGER_WORKING_DIRECTORY
     ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/$(Configuration)
