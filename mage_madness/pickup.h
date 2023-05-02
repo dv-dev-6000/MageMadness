@@ -18,5 +18,6 @@ public:
 
     // methods
     void setActive(bool val);
+    bool getActiveState();
 
 };

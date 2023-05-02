@@ -1,6 +1,7 @@
 //cloud.h
 #pragma once
 #include <SFML/Graphics.hpp>
+#include <SFML/Audio.hpp>
 
 // constant vatiables
 constexpr uint16_t hdGameWidth = 1920;
@@ -29,6 +30,10 @@ extern sf::Font pixFont;
 // Enemies
 extern sf::Texture enemyTurTex;
 extern sf::Texture enemySpikeyTex;
+
+// sounds
+extern sf::SoundBuffer jumpSound;
+extern sf::Sound sound;
 
 // control state
 extern int conScheme;

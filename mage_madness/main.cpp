@@ -19,6 +19,7 @@ using namespace std;
 
 // Forward Declaration for functions ====================================================================================
 void Reload();
+void ResetBackground();
 
 // Game Variables =======================================================================================================
 
@@ -54,8 +55,8 @@ enum class GameState {
 Data db;
 
 // Sound Stuff
-sf::SoundBuffer testSound;
-sf::Sound sound1;
+sf::SoundBuffer jumpSound, collectSound, tpSound, projectileHitSound, deathSound, clickSound, levelEndSound;
+sf::Sound sound;
 
 
 // entities & lists  
@@ -293,6 +294,10 @@ void clickButton(RenderWindow& window) {
 	//find if button is clicked and get button id
 	for (auto buts = begin(buttons); buts != end(buttons); ++buts) {
 
+		//sound
+		sound.setBuffer(clickSound);
+		sound.play();
+
 		int id = (*buts)->isSelected();
 		if (id != 0) {
 			PressButton(id, window);
@@ -303,6 +308,9 @@ void clickButton(RenderWindow& window) {
 }
 
 void KillPlayer() {
+	// play sound
+	sound.setBuffer(deathSound);
+	sound.play();
 	// increment fail count
 	hud->AddFail();
 	// save current fail count
@@ -335,6 +343,11 @@ void TurretShoot(std::shared_ptr<EnemyTurret> turret) {
 }
 
 void PickupCollected() {
+	// play sound 
+	if (pickup->getActiveState()) {
+		sound.setBuffer(collectSound);
+		sound.play();
+	}
 	// deactivate collectable object
 	pickup->setActive(false);
 	// update HUD
@@ -350,6 +363,10 @@ void PickupCollected() {
 }
 
 void NextLevel() {
+	// play sound
+	sound.setBuffer(levelEndSound);
+	sound.play();
+
 	if (currScene == GameScene::mainMenu) {
 		currScene = GameScene::tutorial_1;
 	}
@@ -530,8 +547,32 @@ void Load() {
 		cerr << "Failed to load spritesheet!" << std::endl;
 	}
 
-	// Loading enemies
-	if (!testSound.loadFromFile("res/audio/test.wav"))
+	// Loading sounds
+	if (!jumpSound.loadFromFile("res/audio/Shoot_01.wav"))
+	{
+		cerr << "Failed to load sfx!" << std::endl;
+	}
+	if (!collectSound.loadFromFile("res/audio/Collect.wav"))
+	{
+		cerr << "Failed to load sfx!" << std::endl;
+	}
+	if (!tpSound.loadFromFile("res/audio/Teleport.wav"))
+	{
+		cerr << "Failed to load sfx!" << std::endl;
+	}
+	if (!projectileHitSound.loadFromFile("res/audio/Hit.wav"))
+	{
+		cerr << "Failed to load sfx!" << std::endl;
+	}
+	if (!deathSound.loadFromFile("res/audio/Explosion.wav"))
+	{
+		cerr << "Failed to load sfx!" << std::endl;
+	}
+	if (!clickSound.loadFromFile("res/audio/Menu1.wav"))
+	{
+		cerr << "Failed to load sfx!" << std::endl;
+	}
+	if (!levelEndSound.loadFromFile("res/audio/Achievement.wav"))
 	{
 		cerr << "Failed to load sfx!" << std::endl;
 	}
@@ -1260,8 +1301,7 @@ void Update(RenderWindow& window) {
 					(event.key.code == Keyboard::RControl && conScheme == 2)){
 
 					player->jumpReleased();
-					sound1.setBuffer(testSound);
-					sound1.play();
+					
 				}
 
 				// TESTING SCENE SKIP
@@ -1353,6 +1393,10 @@ void Update(RenderWindow& window) {
 			optional collision = wBounds.findIntersection(projBounds);
 			if ((*it)->getState() && collision) {
 
+				// impact sound
+				sound.setBuffer(projectileHitSound);
+				sound.play();
+
 				// if breakblock then move offscreen
 				if ((*s)->getType() == 3) {
 					(*s)->setPosition({ -128, -128 });
@@ -1404,6 +1448,10 @@ void Update(RenderWindow& window) {
 		optional tpCol = wBounds.findIntersection(tpBounds);
 
 		if (tp->getState() && tpCol) {
+
+			// play sound 
+			sound.setBuffer(tpSound);
+			sound.play();
 
 			// get collision rect
 			FloatRect colRect = tpCol.value();

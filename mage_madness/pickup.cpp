@@ -29,3 +29,7 @@ void PickUp::Render(sf::RenderWindow& window) {
 void PickUp::setActive(bool val) {
 	_isActive = val;
 }
+
+bool PickUp::getActiveState() {
+	return _isActive;
+}

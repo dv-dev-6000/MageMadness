@@ -132,6 +132,11 @@ void Player::jumpPressed() {
 void Player::jumpReleased() {
 
     if (!_isAirborn && _jumpPressed) {
+
+        // play sound 
+        sound.setBuffer(jumpSound);
+        sound.play();
+
         _isAirborn = true;
         _jumpPressed = false;
 
