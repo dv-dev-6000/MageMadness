@@ -253,6 +253,7 @@ void PressButton(int id, RenderWindow& window) {
 			// resume
 			isPaused = false;
 			currState = GameState::playing;
+			ResetBackground();
 			break;
 		case 14:
 			// close game 
@@ -391,6 +392,21 @@ void LoadData() {
 		if (db.CheckCreateSaveFile()) {
 			fileData = db.LoadProgress();
 		}
+	}
+}
+
+void ResetBackground() {
+	if (currScene == GameScene::tutorial_1) {
+		menuBackdropSprite.setTexture(tut1Backdrop);
+	}
+	else if (currScene == GameScene::tutorial_2) {
+		menuBackdropSprite.setTexture(tut2Backdrop);
+	}
+	else if (currScene == GameScene::tutorial_3) {
+		menuBackdropSprite.setTexture(tut3Backdrop);
+	}
+	else {
+		menuBackdropSprite.setTexture(mainBackdrop);
 	}
 }
 
@@ -1228,18 +1244,7 @@ void Update(RenderWindow& window) {
 					currState = GameState::playing;
 					isPaused = false;
 
-					if (currScene == GameScene::tutorial_1) {
-						menuBackdropSprite.setTexture(tut1Backdrop);
-					}
-					else if (currScene == GameScene::tutorial_2) {
-						menuBackdropSprite.setTexture(tut2Backdrop);
-					}
-					else if (currScene == GameScene::tutorial_3) {
-						menuBackdropSprite.setTexture(tut3Backdrop);
-					}
-					else {
-						menuBackdropSprite.setTexture(mainBackdrop);
-					}
+					ResetBackground();
 				}
 				//window.close();
 			}
