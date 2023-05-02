@@ -2,6 +2,7 @@
 #include "entity_management.h"
 #include "player.h"
 #include <SFML/Graphics.hpp>
+#include <random>
 
 enum class SpikeyState {
     Travelling,
@@ -17,6 +18,7 @@ protected:
     float _length;
     sf::Vector2f _direction;
     SpikeyState _currState;
+    float _range;
 
 public:
 
