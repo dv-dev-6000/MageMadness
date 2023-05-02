@@ -897,13 +897,13 @@ void Reload() {
 			// set player values
 			player->setPosition({ initialPlayerPosition });
 			// Set enemy turret1 values
-			t1->setPosition({ 10250, 350 });		// turrets off screen, add a deactivation for levels without all turrets ** 
-			// Set enemy turret2 values				//
-			t2->setPosition({ 9000, 350 });			//
+			t1->setPosition({ 1000, 700 });		 
+			// Set enemy turret2 values				
+			t2->setPosition({ 9000, 350 });	// TURRET OFF THE SCREEN		
 			// Set enemy spikey values
-			enemySpikey->setPosition({ 150, 600 });
+			enemySpikey->setPosition({ 350, 500 });
 			// set collectable
-			pickup->setPosition({ 400, 100 });
+			pickup->setPosition({ 1100, 500 });
 
 			break;
 
@@ -933,13 +933,13 @@ void Reload() {
 			// set player values
 			player->setPosition({ initialPlayerPosition });
 			// Set enemy turret1 values
-			t1->setPosition({ 10250, 350 });		// turrets off screen, add a deactivation for levels without all turrets ** 
-			// Set enemy turret2 values				//
-			t2->setPosition({ 9000, 350 });			//
+			t1->setPosition({ 450, 400 });		 
+			// Set enemy turret2 values				
+			t2->setPosition({ 9000, 350 });		// TURRET OFF THE SCREEN	
 			// Set enemy spikey values
-			enemySpikey->setPosition({ 150, 600 });
+			enemySpikey->setPosition({ 300, 600 });
 			// set collectable
-			pickup->setPosition({ 400, 100 });
+			pickup->setPosition({ 1250, 400 });
 
 			break;
 		case GameScene::level_3:
@@ -968,13 +968,13 @@ void Reload() {
 			// set player values
 			player->setPosition({ initialPlayerPosition });
 			// Set enemy turret1 values
-			t1->setPosition({ 10250, 350 });		// turrets off screen, add a deactivation for levels without all turrets ** 
-			// Set enemy turret2 values				//
-			t2->setPosition({ 9000, 350 });			//
+			t1->setPosition({ 900, 650 });		
+			// Set enemy turret2 values				
+			t2->setPosition({ 9000, 350 });			// TURRET OFF THE SCREEN	
 			// Set enemy spikey values
-			enemySpikey->setPosition({ 150, 600 });
+			enemySpikey->setPosition({ 150, 200 });
 			// set collectable
-			pickup->setPosition({ 400, 100 });
+			pickup->setPosition({ 1798, 310 });
 
 			break;
 		case GameScene::level_4:
@@ -1003,13 +1003,13 @@ void Reload() {
 			// set player values
 			player->setPosition({ initialPlayerPosition });
 			// Set enemy turret1 values
-			t1->setPosition({ 10250, 350 });		// turrets off screen, add a deactivation for levels without all turrets ** 
-			// Set enemy turret2 values				//
-			t2->setPosition({ 9000, 350 });			//
+			t1->setPosition({ 250, 200 });		
+			// Set enemy turret2 values				
+			t2->setPosition({ 1300, 550 });			
 			// Set enemy spikey values
-			enemySpikey->setPosition({ 150, 600 });
+			enemySpikey->setPosition({ 150, 700 });
 			// set collectable
-			pickup->setPosition({ 400, 100 });
+			pickup->setPosition({ 360, 100 });
 
 			break;
 		case GameScene::level_5:
@@ -1038,13 +1038,13 @@ void Reload() {
 			// set player values
 			player->setPosition({ initialPlayerPosition });
 			// Set enemy turret1 values
-			t1->setPosition({ 10250, 350 });		// turrets off screen, add a deactivation for levels without all turrets ** 
-			// Set enemy turret2 values				//
-			t2->setPosition({ 9000, 350 });			//
+			t1->setPosition({ 900, 500 });		
+			// Set enemy turret2 values				
+			t2->setPosition({ 400, 350 });			
 			// Set enemy spikey values
-			enemySpikey->setPosition({ 150, 600 });
+			enemySpikey->setPosition({ 900, 400 });
 			// set collectable
-			pickup->setPosition({ 400, 100 });
+			pickup->setPosition({ 1280, 550 });
 
 			break;
 		case GameScene::boss_level_1:

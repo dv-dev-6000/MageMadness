@@ -6,9 +6,9 @@ aa  aa     aaaa      b     aaa
 a  aa          bbbbbbb       a
 aaa         ggaaaaaaaaaaaaggga
 a   aaaaaaaabb     uuuuuuubbba
-a   a  g   g                 a
-a   b  b   g    aa           a
-a   a      g                 a
+a   a uuu  g                 a
+a   b  g   g    aa           a
+a   a  b   g                 a
 a          g        aa      ea
 a          b                 a
 ass   sss      ss   ss  s  ssa
