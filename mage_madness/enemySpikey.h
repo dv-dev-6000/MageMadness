@@ -16,7 +16,10 @@ protected:
     std::shared_ptr<Player> _player;
     float _speed;
     float _length;
+    float _l;
+    float _distW;
     sf::Vector2f _direction;
+    sf::Vector2f _distance;
     SpikeyState _currState;
     sf::Vector2f _randomPos;
     float _range;

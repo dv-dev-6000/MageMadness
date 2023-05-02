@@ -18,10 +18,12 @@ EnemySpikey::EnemySpikey(std::shared_ptr<Player> &player) : Entity()
 	setTextureRect(IntRect(Vector2(0, 0), Vector2(46, 47)));
 	setTexture(enemySpikeyTex);
 	
+	_distW = 0;
 	_length = 0;
+	_l = 0;
 	_speed = 50;
 	_player = player;
-	_range = 20;
+	_range = 100;
 	_currState = SpikeyState::Travelling; // starting state - change to patrolling later
 
 	_randomPos = generateNewPoint();
@@ -64,27 +66,30 @@ void EnemySpikey::Update(const float& dt)
 		{
 			// Calculate direction from waypoint to player
 			_direction = _randomPos - getPosition();
-			_length = sqrt(_direction.x * _direction.x + _direction.y * _direction.y);
+			_distW = sqrt(_direction.x * _direction.x + _direction.y * _direction.y);
 
 			// If distance to waypoint is above 0.1 travel to it. 
 			// If distance is less than 0.1 then create next random waypoint
 			// Therefore, travel there
-			if (_length > 0.1f)
+			if (_distW > 0.1f)
 			{
-				_direction /= _length;
+				_direction /= _distW;
 				move(_direction * _speed * dt);
 			}
 			else
 			{
 				_randomPos = generateNewPoint();
 			}
+			
 
+			_distance = _player->getPosition() - getPosition();
+			_l = sqrt(_distance.x * _distance.x + _distance.y * _distance.y);
 			// If player is in close range, change current state to following
-			//if ()
-			//{
-			//	_currState = SpikeyState::Following;
-			//	setColor(sf::Color::Red);
-			//}
+			if (_l <= _range)
+			{
+				_currState = SpikeyState::Following;
+				setColor(sf::Color::Cyan);
+			}
 		}
 			break;
 
