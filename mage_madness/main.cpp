@@ -799,11 +799,14 @@ void Reload() {
 			// set player values
 			player->setPosition(initialPlayerPosition);
 			// Set enemy turret1 values
-			t1->setPosition({ 100250, 350 });
+			t1->setPosition({ -200, -200 });
+			t1->setActive(false);
 			// Set enemy turret2 values
-			t2->setPosition({ 90000, 350 });
+			t2->setPosition({ -200, -200 });
+			t2->setActive(false);
 			// Set enemy spikey values
-			enemySpikey->setPosition({ 250,350 });
+			enemySpikey->setPosition({ -200, -200 });
+			enemySpikey->setActive(false);
 			// set collectable
 			pickup->setPosition({ 1792, 448});
 
@@ -835,13 +838,16 @@ void Reload() {
 			// set player values
 			player->setPosition(initialPlayerPosition);
 			// Set enemy turret1 values
-			t1->setPosition({ 100250, 350 });
+			t1->setPosition({ -200, -200 });
+			t1->setActive(false);
 			// Set enemy turret2 values
-			t2->setPosition({ 90000, 350 });
+			t2->setPosition({ -200, -200 });
+			t2->setActive(false);
 			// Set enemy spikey values
-			enemySpikey->setPosition({ 250,350 });
+			enemySpikey->setPosition({ -200, -200 });
+			enemySpikey->setActive(false);
 			// set collectable
-			pickup->setPosition({ 768, 448 });
+			pickup->setPosition({ 1152, 448 });
 
 
 			break;
@@ -874,11 +880,13 @@ void Reload() {
 			// Set enemy turret1 values
 			t1->setPosition({ 1088, 704 });
 			// Set enemy turret2 values
-			t2->setPosition({ 90000, 350 });
+			t2->setPosition({ -200, -200 });
+			t2->setActive(false);
 			// Set enemy spikey values
-			enemySpikey->setPosition({ 250,350 });
+			enemySpikey->setPosition({ -200, -200 });
+			enemySpikey->setActive(false);
 			// set collectable
-			pickup->setPosition({ 768, 448 });
+			pickup->setPosition({ 1472, 512 });
 
 			break;
 
