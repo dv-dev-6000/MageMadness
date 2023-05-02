@@ -57,6 +57,7 @@ Data db;
 // Sound Stuff
 sf::SoundBuffer jumpSound, collectSound, tpSound, projectileHitSound, deathSound, clickSound, levelEndSound;
 sf::Sound sound;
+sf::Music musicMenu, musicGame;
 
 
 // entities & lists  
@@ -446,6 +447,9 @@ void Init() {
 	isPaused = false;
 	levelID = 0;
 	fileData = { 0,0 };
+
+	musicMenu.setVolume(25);
+	sound.setVolume(40);
 }
 
 // Load Content =========================================================================================================
@@ -577,6 +581,16 @@ void Load() {
 		cerr << "Failed to load sfx!" << std::endl;
 	}
 
+	// import music 
+	if (!musicMenu.openFromFile("res/audio/menuBG.wav"))
+	{
+		cerr << "Failed to load track!" << std::endl;
+	}
+	if (!musicGame.openFromFile("res/audio/BG.wav"))
+	{
+		cerr << "Failed to load track!" << std::endl;
+	}
+
 	pixFont.loadFromFile("res/fonts/PressStart2P-Regular.ttf");
 	titleText.setFont(pixFont);
 	debugText.setFont(pixFont);
@@ -600,6 +614,13 @@ void Reload() {
 	titleText.setString(" ");
 	debugText.setString(" ");
 
+	// stop music 
+	musicMenu.stop();
+
+	// play music
+	musicMenu.play();
+	musicMenu.setLoop(true);
+	
 	// re-populate lists -------------------------------------------------
 
 	// DEBUG TEXT
@@ -646,6 +667,7 @@ void Reload() {
 
 	// load pause menu buttons if not main menu
 	if (currScene != GameScene::mainMenu) {
+
 		// load button back to main menu
 		std::shared_ptr<Button> b1 = make_shared<Button>("Save and Quit", 30, sf::Vector2f((view.getCenter().x - 224), 600), 12);
 		menuButtonManager.list.push_back(b1);
