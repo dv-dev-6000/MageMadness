@@ -1,15 +1,15 @@
 qqqqqqqqqqqqqqqqqqqqqqqqqqqqqq
 quuuuuuuuuuuuuuuuuuuuuuuuuuuuq
 q                            q
-q            sqqs            q
-qgggggggggggggqqgggggggggggggq
-qbbbbbbbbbbbbqqqqbbbbbbbbbbbbq
-q           q qq             q
-q          q  bb             q
-qq        q  eqq           qqq
-q          qqqqqqq           q
-q            uuu             q
-qq                          qq
+qggggggggggggqqqqggggggggggggq
+qbbbbbbbbbbbbgqqgbbbbbbbbbbbbq
+q            buub            q
 q                            q
-qsssssssssss  qq  sssssssssssq
+q            qqqq            q
+qqq         q  e q         qqq
+q          q gqqg q          q
+q     bb    bb  bb    bb     q
+qq                          qq
+q             qq             q
+qssssssssssssqqqqssssssssssssq
 qqqqqqqqqqqqqqqqqqqqqqqqqqqqqq

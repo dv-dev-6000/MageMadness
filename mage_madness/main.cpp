@@ -630,14 +630,6 @@ void Reload() {
 	
 	// re-populate lists -------------------------------------------------
 
-	// DEBUG TEXT
-	//db.CheckCreateSavesFolder();
-	//db.CheckCreateSaveFile();
-	//db.UpdateSave(1,2);
-	//debugText.setCharacterSize(50);
-	//debugText.setString(std::to_string(db.LoadProgress().y));
-	//debugText.setPosition({ (view.getSize().x * .5f) - (debugText.getLocalBounds().width * .5f), 10 });
-
 	// load hud
 	hud = std::make_shared<HUD>();
 	entityManager.list.push_back(hud);
@@ -918,7 +910,8 @@ void Reload() {
 			// Set enemy turret1 values
 			t1->setPosition({ 1000, 700 });		 
 			// Set enemy turret2 values				
-			t2->setPosition({ 9000, 350 });	// TURRET OFF THE SCREEN		
+			t2->setPosition({ 9000, 350 });	// TURRET OFF THE SCREEN	
+			t2->setActive(false);
 			// Set enemy spikey values
 			enemySpikey->setPosition({ 350, 500 });
 			// set collectable
@@ -955,6 +948,7 @@ void Reload() {
 			t1->setPosition({ 450, 400 });		 
 			// Set enemy turret2 values				
 			t2->setPosition({ 9000, 350 });		// TURRET OFF THE SCREEN	
+			t2->setActive(false);
 			// Set enemy spikey values
 			enemySpikey->setPosition({ 300, 600 });
 			// set collectable
@@ -990,6 +984,7 @@ void Reload() {
 			t1->setPosition({ 900, 650 });		
 			// Set enemy turret2 values				
 			t2->setPosition({ 9000, 350 });			// TURRET OFF THE SCREEN	
+			t2->setActive(false);
 			// Set enemy spikey values
 			enemySpikey->setPosition({ 150, 200 });
 			// set collectable
@@ -1075,7 +1070,7 @@ void Reload() {
 
 			// boss level 1 logic here
 			currState = GameState::playing;
-			initialPlayerPosition = { 100, 250 };
+			initialPlayerPosition = { 1796, 256 };
 			// level load
 			ls::loadLevelFile("res/levels/bossLevel1.txt");
 			// add tiles to tile list
@@ -1091,13 +1086,13 @@ void Reload() {
 			// set player values
 			player->setPosition({ initialPlayerPosition });
 			// Set enemy turret1 values
-			t1->setPosition({ 10250, 350 });		// turrets off screen, add a deactivation for levels without all turrets ** 
-			// Set enemy turret2 values				//
-			t2->setPosition({ 9000, 350 });			//
+			t1->setPosition({ 576, 634});
+			// Set enemy turret2 values	
+			t2->setPosition({ 128, 128 });
 			// Set enemy spikey values
-			enemySpikey->setPosition({ 150, 600 });
+			enemySpikey->setPosition({ 1000, 800 });
 			// set collectable
-			pickup->setPosition({ 400, 100 });
+			pickup->setPosition({ 1024, 768 });
 
 			break;
 		case GameScene::boss_level_2:
@@ -1109,7 +1104,7 @@ void Reload() {
 
 			// boss level 2 logic here
 			currState = GameState::playing;
-			initialPlayerPosition = { 700, 150 };
+			initialPlayerPosition = { 700, 128 };
 
 			// level load
 			ls::loadLevelFile("res/levels/bossLevel2.txt");
@@ -1126,13 +1121,13 @@ void Reload() {
 			// set player values
 			player->setPosition({ initialPlayerPosition });
 			// Set enemy turret1 values
-			t1->setPosition({ 10250, 350 });		// turrets off screen, add a deactivation for levels without all turrets ** 
-			// Set enemy turret2 values				//
-			t2->setPosition({ 9000, 350 });			//
+			t1->setPosition({ 384, 384 });		
+			// Set enemy turret2 values			
+			t2->setPosition({ 1472, 384 });		
 			// Set enemy spikey values
-			enemySpikey->setPosition({ 150, 600 });
+			enemySpikey->setPosition({ 1000, 800 });
 			// set collectable
-			pickup->setPosition({ 400, 100 });
+			pickup->setPosition({ 384, 512 });
 
 			break;
 
@@ -1145,7 +1140,7 @@ void Reload() {
 
 			// boss level 3 logic here
 			currState = GameState::playing;
-			initialPlayerPosition = { 1750, 800 };
+			initialPlayerPosition = { 896, 192 };
 
 			// level load
 			ls::loadLevelFile("res/levels/bossLevel3.txt");
@@ -1162,13 +1157,13 @@ void Reload() {
 			// set player values
 			player->setPosition({ initialPlayerPosition });
 			// Set enemy turret1 values
-			t1->setPosition({ 10250, 350 });		// turrets off screen, add a deactivation for levels without all turrets ** 
-			// Set enemy turret2 values				//
-			t2->setPosition({ 9000, 350 });			//
+			t1->setPosition({ 512, 384 });		
+			// Set enemy turret2 values			
+			t2->setPosition({ 1344, 384 });		
 			// Set enemy spikey values
-			enemySpikey->setPosition({ 150, 600 });
+			enemySpikey->setPosition({ 1000, 800 });
 			// set collectable
-			pickup->setPosition({ 400, 100 });
+			pickup->setPosition({ 512, 704 });
 
 			break;
 
@@ -1562,6 +1557,12 @@ void Update(RenderWindow& window) {
 		sf::Vector2f pCentre = { pBounds.left + (pBounds.width * 0.5f), pBounds.top + (pBounds.height * 0.5f) };
 		if (pickup->getGlobalBounds().contains(pCentre)) {
 			PickupCollected();
+		}
+
+		// check player against enemyspikey
+		if (enemySpikey->getGlobalBounds().contains(pCentre)) {
+			KillPlayer();
+			break;
 		}
 	}
 	//=======================================================================================================================================================
