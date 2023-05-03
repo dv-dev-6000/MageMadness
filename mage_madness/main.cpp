@@ -89,6 +89,7 @@ sf::Vector2i fileData;
 bool optionMenuOpen;
 bool howToPlayOpen;
 bool isPaused;
+bool isComplete;
 
 // cursor move with controller
 int moveX;
@@ -111,7 +112,7 @@ Text debugText;
 // textures 
 sf::Texture tileTex, breakTileTex, gravTileTex, spikeTileTex, bossBlockTileTex, area1BlockTileTex, endBlockTileTex, upDownSpikesTex;
 sf::Texture optionsBackdrop, howToBackdrop, howToBackdropLefty, howToBackdropController;
-sf::Texture tut1Backdrop, tut2Backdrop, tut3Backdrop, mainBackdrop;
+sf::Texture tut1Backdrop, tut2Backdrop, tut3Backdrop, mainBackdrop, endBackdrop;
 sf::Texture hudBaseTex, hudOverTex;
 sf::Texture pauseTex;
 sf::Texture cursorTex;
@@ -265,6 +266,7 @@ void PressButton(int id, RenderWindow& window) {
 			optionMenuOpen = false;
 			howToPlayOpen = false;
 			isPaused = false;
+			isComplete = false;
 			currScene = GameScene::mainMenu;
 			Reload();
 			break;
@@ -418,6 +420,9 @@ void NextLevel() {
 	else if (currScene == GameScene::boss_level_2) {
 		currScene = GameScene::boss_level_3;
 	}
+	else if (currScene == GameScene::boss_level_3) {
+		isComplete = true;
+	}
 	Reload();
 }
 
@@ -462,6 +467,7 @@ void Init() {
 	moveY = false;
 	needToBreak = false;
 	isPaused = false;
+	isComplete = false;
 	levelID = 0;
 	fileData = { 0,0 };
 
@@ -529,6 +535,9 @@ void Load() {
 		cerr << "Failed to load spritesheet!" << std::endl;
 	}
 	if (!mainBackdrop.loadFromFile("res/img/mainback.png")) {
+		cerr << "Failed to load spritesheet!" << std::endl;
+	}
+	if (!endBackdrop.loadFromFile("res/img/end.png")) {
 		cerr << "Failed to load spritesheet!" << std::endl;
 	}
 
@@ -677,14 +686,16 @@ void Reload() {
 	// load pause menu buttons if not main menu
 	if (currScene != GameScene::mainMenu) {
 
-		// load button back to main menu
-		std::shared_ptr<Button> b1 = make_shared<Button>("Save and Quit", 30, sf::Vector2f((view.getCenter().x - 224), 500), 12);
-		menuButtonManager.list.push_back(b1);
-		buttons.push_back(b1);
-		// load button resume
-		std::shared_ptr<Button> b2 = make_shared<Button>("Resume", 40, sf::Vector2f((view.getCenter().x - 224), 800), 13);
-		menuButtonManager.list.push_back(b2);
-		buttons.push_back(b2);
+		if (!isComplete) {
+			// load button back to main menu
+			std::shared_ptr<Button> b1 = make_shared<Button>("Save and Quit", 30, sf::Vector2f((view.getCenter().x - 224), 500), 12);
+			menuButtonManager.list.push_back(b1);
+			buttons.push_back(b1);
+			// load button resume
+			std::shared_ptr<Button> b2 = make_shared<Button>("Resume", 40, sf::Vector2f((view.getCenter().x - 224), 800), 13);
+			menuButtonManager.list.push_back(b2);
+			buttons.push_back(b2);
+		}
 		// load button resume
 		std::shared_ptr<Button> b3 = make_shared<Button>("Quit", 40, sf::Vector2f((view.getCenter().x - 224), 650), 15);
 		menuButtonManager.list.push_back(b3);
@@ -1181,6 +1192,11 @@ void Reload() {
 			break;
 	}
 
+	if (isComplete) {
+		currState = GameState::menu;
+		menuBackdropSprite.setTexture(endBackdrop);
+	}
+
 	// Spikey enemy
 	entityManager.list.push_back(enemySpikey);
 }
@@ -1333,7 +1349,6 @@ void Update(RenderWindow& window) {
 
 					ResetBackground();
 				}
-				//window.close();
 			}
 		}
 
@@ -1348,12 +1363,6 @@ void Update(RenderWindow& window) {
 
 					player->jumpReleased();
 					
-				}
-
-				// TESTING SCENE SKIP
-				if (event.key.code == Keyboard::Right) {
-
-					NextLevel();
 				}
 			}
 
@@ -1599,7 +1608,7 @@ void Render(RenderWindow& window) {
 	else if (currState == GameState::menu) {
 		
 		// draw backdrop behind content
-		if (optionMenuOpen || howToPlayOpen || isPaused) {
+		if (optionMenuOpen || howToPlayOpen || isPaused || isComplete) {
 			window.draw(menuBackdropSprite);
 		}
 		else {
