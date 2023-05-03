@@ -282,11 +282,16 @@ void MoveCursor(float dt) {
 // Left click or controller right shoulder
 void ClickOne(RenderWindow& window) {
 
+	// get player centre
+	sf::FloatRect pBounds = player->getGlobalBounds();
+	sf::Vector2f pCentre = { pBounds.left + (pBounds.width * 0.5f), pBounds.top + (pBounds.height * 0.5f) - 10 };
+
+	// fire
 	if (player->getScharge() < 995) {
-		projectiles[0]->fireMe(player->getPosition(), cursor.getPosition(), 1, 500, false);
+		projectiles[0]->fireMe(pCentre, cursor.getPosition(), 1, 500, false);
 	}
 	else {
-		projectiles[0]->fireMe(player->getPosition(), cursor.getPosition(), 2, 500, false);
+		projectiles[0]->fireMe(pCentre, cursor.getPosition(), 2, 500, false);
 	}
 	player->projectileReleased();
 }
@@ -294,7 +299,12 @@ void ClickOne(RenderWindow& window) {
 // right click or controller left shoulder
 void ClickTwo(RenderWindow& window) {
 
-	tp->fireMe(player->getPosition(), cursor.getPosition(), 1, 500, false);
+	// get player centre
+	sf::FloatRect pBounds = player->getGlobalBounds();
+	sf::Vector2f pCentre = { pBounds.left + (pBounds.width * 0.5f), pBounds.top + (pBounds.height * 0.5f) - 10 };
+
+	// fire
+	tp->fireMe(pCentre, cursor.getPosition(), 1, 500, false);
 }
 
 void clickButton(RenderWindow& window) {

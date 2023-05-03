@@ -8,8 +8,8 @@ q    q     g   uqqu         gq
 q    q  e  b    uu         ggq
 qqbbqqqqqqq               gggq
 q    q    qqqqqqqqqqqqqqqbbbbq
-q           uuu g uuu        q
-q               b            q
+q            uu q uu         q
+q                            q
 q    q                       q
 qssssqqqqqqqssssqssssqqqqqqqqq
 qqqqqqqqqqqqqqqqqqqqqqqqqqqqqq

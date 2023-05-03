@@ -18,7 +18,7 @@ EnemySpikey::EnemySpikey(std::shared_ptr<Player> &player) : Entity()
 	_l = 0;
 	_speed = 50;
 	_player = player;
-	_range = 400;
+	_range = 250;
 	_currState = SpikeyState::Travelling; // starting state - change to patrolling later
 
 	_randomPos = generateNewPoint();
